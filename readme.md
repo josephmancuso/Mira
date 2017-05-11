@@ -12,11 +12,11 @@ Routing can be done like so:
 
 ```php
 Route::get('url', function(){
-	//logic goes here
+    //logic goes here
 });
 
 Route::post('url', function(){
-	//logic goes here
+    //logic goes here
 });
 ```
 ### Templates
@@ -26,7 +26,9 @@ All templates go inside the `application/templates` folder
 ```php
 Route::get('url', function(){
     // template for discover.php
-	Render::view("discover", ['variable' => 'value']);
+    
+    Render::view("discover", ['variable' => 'value']);
+    
 });
 ```
 
@@ -36,11 +38,14 @@ Route::get('url', function(){
 Route::get('url', function(){
     $players = new player("database_name");
     $teams = new teams("database_name");
-	Render::view("discover", 
-	[
-	    'players' => $players->all(),
-	    'teams' => $teams->all(),
-	]);
+    
+    Render::view("discover", 
+    [
+    
+        'players' => $players->all(),
+	'teams' => $teams->all(),
+	
+    ]);
 });
 ```
 
@@ -50,11 +55,15 @@ Route::get('url', function(){
 <?php
 // player.php template
 foreach($_['players'] as $player){
+
     echo "Player: ".$player['name'];
+    
 }
 
 foreach($_['teams'] as $team){
+
     echo "Team: ".$team['name'];
+    
 }
 ```
 

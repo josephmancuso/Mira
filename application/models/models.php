@@ -2,8 +2,4 @@
 
 require 'inherit.php';
 
-#models
-
-
-
-?>
+// models

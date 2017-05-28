@@ -23,6 +23,25 @@ Route::get("path/to/url", function(){
 });
 ```
 
+You can also get certain values from the URL and pass them to your view or use them in your Closure
+
+```php
+// application/Routes.php
+
+// URL: website.com/baseball/player/123/
+Route::get("baseball/player/{id}/", function($id){
+     // $id is now accessible : $id = 123
+     $model = new model("database");
+     $player = $model->filter(" id = '$id' ");
+
+     Render::view("appname.template", 
+     [
+          "player" => $player
+     ]
+     );
+});
+```
+
 ## Models
 
 ```php

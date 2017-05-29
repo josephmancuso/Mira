@@ -1,10 +1,46 @@
 Please read full documentation:
 
-[Documentation Wiki](https://github.com/josephmancuso/DollarScore/wiki)
+[Documentation Wiki](https://github.com/josephmancuso/DollarScore/wiki)  
+[Example of a self contained app](https://github.com/taloncode/mustache)
 
 ## About
 
 DollarScore is a PHP MVC motivated by the Python Django MVC Framework. The goal is to create an MVC that supports self contained apps, has an admin panel, and eventually a full CMS with plugins and themes.
+
+## Installation
+
+```shell
+$ git clone https://github.com/josephmancuso/DollarScore.git
+```
+
+Then inside the root of the project (where `cli.php` is located)
+
+```shell
+$ php cli.php --install taloncode/mustache
+```
+This will install an app from GitHub into your project 
+
+Then add mustache to the main config file inside a templates array so the routes are added to your main routes file like so:
+
+(inside `config/config.php`).
+
+```php
+return [
+    'database' => [
+        'username' => 'user',
+        'password' => 'password',
+    ],
+    'templates' => [
+        'mustache',
+    ],
+    'header' => 'dollarscore.base',
+    'footer' => 'dollarscore.footer',
+];
+```
+
+Open up your project using your normal webserver (like typing localhost into your browser)
+
+More information inside the wiki
 
 ## Examples
 
@@ -88,9 +124,50 @@ The config file is meant to create app specific header and footer templates
 
 return [
     "header" => "appname.base",
-    "footer" => "appname/footer"
+    "footer" => "appname.footer"
 ];
 ```
+
+### Installing Apps
+
+Apps can be installed from GitHub. Find the app you want on GitHub and then in the command line do:
+
+In the root directory, (the directory that contains the `cli.php` file)
+
+```shell
+    $ php cli.php --install githubaccount/reponame
+```
+
+To try this out for a real app, do: 
+
+```shell
+    $ php cli.php --install taloncode/mustache
+```
+
+this will install an pre made app into your `app` directory
+
+### Linking the Router
+
+Each app can have its own router added to the main `application/Routes/routes.php` file. 
+
+Open up your main `config/config.php` file and add a `templates` array to the file like so:
+
+```php
+return [
+    'database' => [
+        'username' => 'user',
+        'password' => 'password',
+    ],
+    'templates' => [
+        'dollarscore',
+        'mustache',
+    ],
+    'header' => 'dollarscore.base',
+    'footer' => 'dollarscore.footer',
+];
+```
+
+This will add the apps routers in order they are in the templates array
 
 ## Templates
 

@@ -13,6 +13,11 @@ if (in_array("--new", $argv)) {
     $i_database = str_replace(' ', '_', strtolower(trim(fgets(STDIN, 1024))));
 
     Model::new($i_model, $i_database);
+} elseif (in_array("--install", $argv)) {
+    $repo = explode("/", $argv[2]);
+    $repo_user = $repo[0];
+    $repo_name = $repo[1];
+    echo shell_exec("cd application/app && git clone https://github.com/$repo_user/$repo_name.git" );
 } else {
     echo $argv[1]." is not a command.";
 }

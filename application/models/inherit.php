@@ -133,6 +133,22 @@ abstract class Model
         
         return $query->fetchAll();
     }
+
+    public function toJson($where_clause = 1)
+    {
+        global $config;
+        $handler = new PDO('mysql:host=localhost;dbname='.$this->database,$config['database']['username'],$config['database']['password']);
+        
+        if (strpos(static::class, "_") !== false) {
+            $table = str_replace("_", "-", static::class);
+        } else {
+            $table = static::class;
+        }
+        
+        $query = $handler->query("SELECT * FROM $table WHERE $where_clause");
+
+        return json_encode($query->fetchAll());
+    }
     
     #### UPDATE
     

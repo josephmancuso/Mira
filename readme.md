@@ -88,7 +88,7 @@ The config file is meant to create app specific header and footer templates
 
 return [
     "header" => "appname.base",
-    "footer" => "appname/footer"
+    "footer" => "appname.footer"
 ];
 ```
 

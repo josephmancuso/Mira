@@ -92,6 +92,47 @@ return [
 ];
 ```
 
+### Installing Apps
+
+Apps can be installed from GitHub. Find the app you want on GitHub and then in the command line do:
+
+In the root directory, (the directory that contains the `cli.php` file)
+
+```shell
+    $ php cli.php --install githubaccount/reponame
+```
+
+To try this out for a real app, do: 
+
+```shell
+    $ php cli.php --install taloncode/mustache
+```
+
+this will install an pre made app into your `app` directory
+
+### Linking the Router
+
+Each app can have its own router added to the main `application/Routes/routes.php` file. 
+
+Open up your main `config/config.php` file and add a `templates` array to the file like so:
+
+```php
+return [
+    'database' => [
+        'username' => 'user',
+        'password' => 'password',
+    ],
+    'templates' => [
+        'dollarscore',
+        'mustache',
+    ],
+    'header' => 'dollarscore.base',
+    'footer' => 'dollarscore.footer',
+];
+```
+
+This will add the apps routers in order they are in the templates array
+
 ## Templates
 
 Templates can be used in the `app/app_name/templates/` directory.

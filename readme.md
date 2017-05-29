@@ -7,6 +7,36 @@ Please read full documentation:
 
 DollarScore is a PHP MVC motivated by the Python Django MVC Framework. The goal is to create an MVC that supports self contained apps, has an admin panel, and eventually a full CMS with plugins and themes.
 
+## Installation
+
+```shell
+$ git clone https://github.com/josephmancuso/DollarScore.git
+```
+
+Then inside the root of the project (where `cli.php` is located)
+
+```shell
+$ php cli.php --install taloncode/mustache
+```
+
+Then add mustache to the main config file inside a templates array like so:
+
+(inside config/config.php)
+
+```php
+return [
+    'database' => [
+        'username' => 'user',
+        'password' => 'password',
+    ],
+    'templates' => [
+        'mustache',
+    ],
+    'header' => 'dollarscore.base',
+    'footer' => 'dollarscore.footer',
+];
+```
+
 ## Examples
 
 ## Routing

@@ -2,12 +2,11 @@
 
 return [
     'database' => [
-        'username' => 'Database Username',
-        'password' => 'Database Password',
+        'username' => 'database_user',
+        'password' => 'database_password',
     ],
-    'apps' => [
-        'dollarscore',
-        'app',
+    'templates' => [
+        'admin',
     ],
     'header' => 'dollarscore.base',
     'footer' => 'dollarscore.footer',

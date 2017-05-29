@@ -1,6 +1,7 @@
 Please read full documentation:
 
 [Documentation Wiki](https://github.com/josephmancuso/DollarScore/wiki)
+[Example of a self contained app](https://github.com/taloncode/mustache)
 
 ## About
 

@@ -18,10 +18,11 @@ Then inside the root of the project (where `cli.php` is located)
 ```shell
 $ php cli.php --install taloncode/mustache
 ```
+This will install an app from GitHub into your project 
 
-Then add mustache to the main config file inside a templates array like so:
+Then add mustache to the main config file inside a templates array so the routes are added to your main routes file like so:
 
-(inside config/config.php)
+(inside `config/config.php`).
 
 ```php
 return [
@@ -36,6 +37,10 @@ return [
     'footer' => 'dollarscore.footer',
 ];
 ```
+
+Open up your project using your normal webserver (like typing localhost into your browser)
+
+More information inside the wiki
 
 ## Examples
 

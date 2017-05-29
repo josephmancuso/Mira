@@ -2,10 +2,9 @@ RewriteEngine on
 
 Redirect /index.php /home/
 
+RewriteCond %{REQUEST_FILENAME} !\.(gif|jpg|png)$
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-l
 
-RewriteRule ^(.+)$ application/Routes/routes.php?url=$1 [QSA,L]
-
-
+RewriteRule ^(.*)$ application/Routes/routes.php?url=$1 [QSA,L]

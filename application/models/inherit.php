@@ -8,15 +8,18 @@ abstract class Model
     public $database = null;
     public $arr = array();
     public $update = array();
+    public $structure = array();
     
     
-    private function __construct($default_database)
+    public function __construct($default_database = null)
     {
-        if (!$default_database) {
+        if (isset($this->db)) {
+            $this->database = $this->db;
+        } elseif ($default_database === null) {
             echo("DID NOT SUPPLY DATABASE INSIDE INSTATIATED CLASS");
+        } else {
+            $this->database = $default_database;
         }
-        
-        $this->database = $default_database;
 
         return static::class;
     }
@@ -121,6 +124,12 @@ abstract class Model
         }
         
         $query = $handler->query("SELECT * FROM $table WHERE $where_clause");
+        $this->structure = array();
+        //echo $query->columnCount();
+
+        for ($i = 0; $i < $query->columnCount(); $i++) {
+            array_push($this->structure, $query->getColumnMeta($i));
+        }
         
         return $query->fetchAll();
     }
@@ -145,6 +154,32 @@ abstract class Model
         }
         
         return $query = $handler->prepare("UPDATE `$table` SET $val WHERE $where_clause LIMIT 1");
+    }
+
+    public function updateFromPost($post, $where_clause = 1)
+    {
+        foreach ($post as $key => $value) {
+            $values .= "`".$key."` = '".$value."',";
+        }
+        
+        $val = str_replace(":", "", $values);
+        $val = rtrim($val, ",");
+
+        global $config;
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+        
+        if (strpos(static::class, "_") !== false) {
+            $table = str_replace("_", "-", static::class);
+        } else {
+            $table = static::class;
+        }
+        
+        return $query = $handler->query("UPDATE `$table` SET $val WHERE $where_clause LIMIT 1");
     }
     
     #### DELETE

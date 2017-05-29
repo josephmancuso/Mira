@@ -8,7 +8,7 @@ class Route
         //
     }
     
-    public function get($url, Closure $func)
+    public static function get($url, Closure $func)
     {
         
         $startDelimiter = "{";
@@ -76,8 +76,6 @@ class Route
             
             
             echo "<h1>";
-            $location = str_replace("\Routes", "", __dir__)."/app/big/".$file;
-            echo $location;
             
             echo "</h1>";
             if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
@@ -90,7 +88,7 @@ class Route
         }
     }
     
-    public function post($url, Closure $func)
+    public static function post($url, Closure $func)
     {
         $startDelimiter = "{";
         $endDelimiter = "}";
@@ -151,7 +149,7 @@ class Route
         $_REQUEST['url'] = $_SERVER['REQUEST_URI'];
         //$z = 'jmancuso';
         
-        if (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "POST") {
+        if (preg_match("/^".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "POST") {
             require_once 'extendsFrom.php';
         } elseif (preg_match("/^res/", $_GET['url'])) {
             echo $_SERVER['DOCUMENT_ROOT'];
@@ -161,8 +159,6 @@ class Route
             
             
             echo "<h1>";
-            $location = str_replace("\Routes", "", __dir__)."/app/big/".$file;
-            echo $location;
             
             echo "</h1>";
             if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
@@ -182,7 +178,7 @@ class Render
         //
     }
     
-    public function view($template, $_ = "")
+    public static function view($template, $_ = "")
     {
         $app_name = explode('.', $template);
         
@@ -253,6 +249,11 @@ class Render
                 include_once "../templates/$app_template.php";
             }
         }
+    }
+
+    public static function redirect($url)
+    {
+        Header("Location: $url");
     }
     
     private function getHeader()

@@ -67,13 +67,6 @@ Route::get("admin/$", function () {
         $site_classes[] = file_get_php_classes("../app/$app/models/models.php");
     }
 
-
-    echo "<pre>";
-    print_r($site_classes);
-    echo "</pre>";
-
-    //$site_classes = file_get_php_classes("../models/models.php");
-
     Render::view("admin.index", [
         "site_classes" => $site_classes,
     ]);

@@ -13,6 +13,8 @@ DollarScore is a PHP MVC motivated by the Python Django MVC Framework. The goal 
 $ git clone https://github.com/josephmancuso/DollarScore.git
 ```
 
+Take the contents of this repo you just cloned and put it into the root directory
+
 Then inside the root of the project (where `cli.php` is located)
 
 ```shell

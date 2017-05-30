@@ -10,4 +10,5 @@ if ($config['templates']) {
     }
 }
 
+
 // routes go here

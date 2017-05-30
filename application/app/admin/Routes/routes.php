@@ -25,7 +25,7 @@ function get_php_classes($php_code)
 
 Route::get("admin/{model}/view/$", function ($model) {
     $placeholder = $model;
-    $model = new $placeholder("relationship");
+    $model = new $placeholder();
     Render::view("admin.model-view", [
         "models" => $model->all(),
         "model_name" => $placeholder,
@@ -61,7 +61,18 @@ Route::get("admin/$", function () {
     if (!$_SESSION['logged']) {
          Render::redirect("/admin/login/");
     }
-    $site_classes = file_get_php_classes("../models/models.php");
+    $config = include '../../config/config.php';
+    foreach ($config['models'] as $app) {
+        $site_classes[] = $app;
+        $site_classes[] = file_get_php_classes("../app/$app/models/models.php");
+    }
+
+
+    echo "<pre>";
+    print_r($site_classes);
+    echo "</pre>";
+
+    //$site_classes = file_get_php_classes("../models/models.php");
 
     Render::view("admin.index", [
         "site_classes" => $site_classes,

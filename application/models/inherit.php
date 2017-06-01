@@ -21,6 +21,101 @@ abstract class Model
             $this->database = $default_database;
         }
 
+        // check if database exists
+        global $config;
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+        $table = static::class;
+        $query = $handler->query("SHOW TABLES LIKE '$table' ");
+        
+        // query the database
+        // get the columns and echo them
+        
+        if ($this->create == true && $query->rowCount()) {
+            // the table exists and create is true. try and add the columns
+            $query = $handler->query("SELECT * FROM $table WHERE 1");
+            $get_column = $query->GetColumnMeta(1);
+            
+            // match the get column ['name'] to each element in the array.
+            $variables = get_class_vars(static::class);
+            
+            
+            foreach ($variables as $variable) {
+                $get_column = $query->GetColumnMeta($i);
+                
+                if ($variable) {
+                    //if ($get_column['name'] == array_keys($variables)[$i+1] ){
+                    if (in_array($get_column['name'], array_keys($variables), true)) {
+                        
+                        
+                    } else {
+                        // add the columns to the table
+                        $column_name = array_keys($variables)[$i+1];
+                        $data_type = array_values($variables)[$i+1];
+                        $old_column = $get_column['name'];
+                        
+                        if ($data_type == "varchar") {
+                            $data_type = "VARCHAR (255)";
+                        } elseif ($data_type == "int") {
+                            $data_type = "INT (11)";
+                        }
+                        
+                        // modify table
+                        if ($handler->query("ALTER TABLE $table CHANGE $old_column $column_name $data_type")) {
+                        } else {
+                            if ($data_type == "varchar") {
+                                $data_type = "VARCHAR (255)";
+                            } elseif ($data_type == "int") {
+                                $data_type = "INT (11)";
+                            }
+                            
+                            
+                            $handler->query("ALTER TABLE $table ADD $column_name $data_type");
+                        }
+                        // add column
+                    }
+                    $i++;
+                }
+            }
+        }
+        
+        
+        if (!$query->rowCount() && $this->create == true) {
+            // check if database exists
+            global $config;
+            $handler = new PDO(
+                'mysql:host=localhost;dbname='.
+                $this->database,
+                $config['database']['username'],
+                $config['database']['password']
+            );
+            $table = static::class;
+            $query = $handler->query("SHOW TABLES LIKE '$table' ");
+            
+            // Construct a query
+            $testing = get_class_vars(static::class);
+            $query_s = "";
+            $query_s .= "CREATE TABLE $table ( ";
+            foreach ($testing as $key => $value) {
+                if ($value === "id") {
+                    $query_s .= $key ." INT (11) UNSIGNED AUTO_INCREMENT PRIMARY KEY, ";
+                } elseif ($value === "int") {
+                    $query_s .= $key ." INT (11), ";
+                } elseif ($value === "varchar") {
+                    $query_s .= $key ." VARCHAR (255) NOT NULL,";
+                }
+            }
+            $query_s = rtrim($query_s, ",");
+            $query_s .= ")";
+            
+            // table does not exist, create the table
+            $handler->query($query_s);
+        }
+
         return static::class;
     }
     
@@ -53,6 +148,29 @@ abstract class Model
             $this->arr[$method] = $value[0];
         }
     }
+
+    public function getColumns()
+    {
+        global $config;
+        $handler = new PDO('mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+        
+        if (strpos(static::class, "_") !== false) {
+            $table = str_replace("_", "-", static::class);
+        } else {
+            $table = static::class;
+        }
+
+        $rs = $handler->query("SELECT * FROM $table LIMIT 1");
+        for ($i = 0; $i < $rs->columnCount(); $i++) {
+            $col = $rs->getColumnMeta($i);
+            $columns[] = $col['name'];
+        }
+        return $columns;
+    }
     
     #### CREATE
     
@@ -73,6 +191,33 @@ abstract class Model
         $view_query = "INSERT INTO `$table` ($cols) VALUES($newkey)";
         return $query = $handler->prepare("INSERT INTO `$table` ($cols) VALUES($newkey)");
     }
+
+    public function insertFromPost($post)
+    {
+        print_r($post);
+        
+        foreach ($post as $key => $value) {
+            $cols .= "--".$key;
+            $values .= "--'".$value."'";
+        }
+
+        $cols = str_replace("--", ",", trim($cols));
+        $cols = ltrim($cols, ',');
+        $values = str_replace("--", ",", trim($values));
+        $values = ltrim($values, ",");
+
+        global $config;
+        $handler = new PDO('mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+        $table = static::class;
+        echo $view_query = "INSERT INTO `$table` ($cols) VALUES ($values)";
+        return $query = $handler->query("INSERT INTO `$table` ($cols) VALUES ($values)");
+    }
+
+
     
     #### READ
     public function all()

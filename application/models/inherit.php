@@ -132,13 +132,13 @@ abstract class Model
         $choice = explode("_", $method);
         
         if ($choice[0] == "update") {
-            
             // This is an update call
             $method = explode("update", $method);
             $method = strtolower(substr_replace($method[1], ":", 0, 0));
             $method = str_replace("_", "", $method);
             $this->update[$method] = $value[0];
-        } else {
+        } elseif ($choice[0] == "set") {
+            // make this elseif and do "set"
             // This is an set call to be inserted into a database.
             
             $method = explode("set", $method);
@@ -147,6 +147,30 @@ abstract class Model
             
             $this->arr[$method] = $value[0];
         }
+        // make this else here
+
+        // find the string contraint leagues_users_fk
+        // explode _
+        // $cl = new explode[1]();
+        // return $cl;
+
+        global $config;
+        $handler = new PDO('mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+
+        $class_name = static::class;
+
+        $query = $handler->query("
+            SELECT `REFERENCED_TABLE_NAME` FROM `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE `REFERENCED_TABLE_SCHEMA` = '$this->database' AND `TABLE_NAME` = '$class_name' AND `COLUMN_NAME` = '$method';
+            ");
+        
+        $reference_table = $query->fetchAll()[0]['REFERENCED_TABLE_NAME'];
+        $cl = new $reference_table();
+        return $cl;
+        //return $cl->getColumns();
     }
 
     public function getColumns()
@@ -167,6 +191,7 @@ abstract class Model
         $rs = $handler->query("SELECT * FROM $table LIMIT 1");
         for ($i = 0; $i < $rs->columnCount(); $i++) {
             $col = $rs->getColumnMeta($i);
+            //print_r($col);
             $columns[] = $col['name'];
         }
         return $columns;

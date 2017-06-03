@@ -4,6 +4,9 @@ Please read full documentation:
 [Example of a self contained app](https://github.com/taloncode/mustache)
 
 <img src="https://img.shields.io/badge/PHP-5.6%2B-brightgreen.svg" alt="PHP Version"> [![DUB](https://img.shields.io/dub/l/vibe-d.svg)]()
+<img src="https://img.shields.io/badge/Coverage-None-lightgrey.svg" alt="PHP Version">
+<img src="https://img.shields.io/badge/stable-v0.1.0-blue.svg" alt="PHP Version">
+
 
 ## About
 

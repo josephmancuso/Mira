@@ -50,27 +50,39 @@ abstract class Model
                 if ($variable) {
                     //if ($get_column['name'] == array_keys($variables)[$i+1] ){
                     if (in_array($get_column['name'], array_keys($variables), true)) {
-                        
-                        
+                        //
                     } else {
                         // add the columns to the table
                         $column_name = array_keys($variables)[$i+1];
                         $data_type = array_values($variables)[$i+1];
                         $old_column = $get_column['name'];
                         
-                        if ($data_type == "varchar") {
+                        if ($data_type === "varchar") {
                             $data_type = "VARCHAR (255)";
-                        } elseif ($data_type == "int") {
+                        } elseif ($data_type === "int") {
                             $data_type = "INT (11)";
+                        } elseif ($data_type === "datetime") {
+                            $data_type = "DATETIME";
+                        } elseif ($data_type === "date") {
+                            $data_type = "DATE";
+                        } elseif ($data_type === "text") {
+                            $data_type = "TEXT(1500)";
                         }
                         
                         // modify table
                         if ($handler->query("ALTER TABLE $table CHANGE $old_column $column_name $data_type")) {
+                                //
                         } else {
-                            if ($data_type == "varchar") {
+                            if ($data_type === "varchar") {
                                 $data_type = "VARCHAR (255)";
-                            } elseif ($data_type == "int") {
+                            } elseif ($data_type === "int") {
                                 $data_type = "INT (11)";
+                            } elseif ($data_type === "datetime") {
+                                $data_type = "DATETIME";
+                            } elseif ($data_type === "date") {
+                                $data_type = "DATE";
+                            } elseif ($data_type === "text") {
+                                $data_type = "TEXT(1500)";
                             }
                             
                             
@@ -155,7 +167,8 @@ abstract class Model
         // return $cl;
 
         global $config;
-        $handler = new PDO('mysql:host=localhost;dbname='.
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
             $this->database,
             $config['database']['username'],
             $config['database']['password']
@@ -164,7 +177,11 @@ abstract class Model
         $class_name = static::class;
 
         $query = $handler->query("
-            SELECT `REFERENCED_TABLE_NAME` FROM `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE `REFERENCED_TABLE_SCHEMA` = '$this->database' AND `TABLE_NAME` = '$class_name' AND `COLUMN_NAME` = '$method';
+            SELECT `REFERENCED_TABLE_NAME` FROM 
+            `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE `
+            REFERENCED_TABLE_SCHEMA` = '$this->database' AND 
+            `TABLE_NAME` = '$class_name' AND 
+            `COLUMN_NAME` = '$method';
             ");
         
         $reference_table = $query->fetchAll()[0]['REFERENCED_TABLE_NAME'];
@@ -176,7 +193,8 @@ abstract class Model
     public function getColumns()
     {
         global $config;
-        $handler = new PDO('mysql:host=localhost;dbname='.
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
             $this->database,
             $config['database']['username'],
             $config['database']['password']
@@ -209,9 +227,14 @@ abstract class Model
         $cols = str_replace(":", "", trim($newkey));
         $cols = str_replace(" ", ",", $cols);
         
-        $newkey = str_replace(" ", ",", trim($newkey));     
+        $newkey = str_replace(" ", ",", trim($newkey));
         
-        $handler = new PDO('mysql:host=localhost;dbname='.$this->database,$config['database']['username'],$config['database']['password']);
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
         $table = static::class;
         $view_query = "INSERT INTO `$table` ($cols) VALUES($newkey)";
         return $query = $handler->prepare("INSERT INTO `$table` ($cols) VALUES($newkey)");
@@ -232,7 +255,8 @@ abstract class Model
         $values = ltrim($values, ",");
 
         global $config;
-        $handler = new PDO('mysql:host=localhost;dbname='.
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
             $this->database,
             $config['database']['username'],
             $config['database']['password']
@@ -248,7 +272,12 @@ abstract class Model
     public function all()
     {
         global $config;
-        $handler = new PDO('mysql:host=localhost;dbname='.$this->database,$config['database']['username'],$config['database']['password']);
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
         
         if (strpos(static::class, "_") !== false) {
             $table = str_replace("_", "-", static::class);
@@ -263,7 +292,12 @@ abstract class Model
     
     public function get($where_clause = 1)
     {
-        $handler = new PDO('mysql:host=localhost;dbname='.$this->database,$config['database']['username'],$config['database']['password']);
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
         
         if (strpos(static::class, "_") !== false) {
             $table = str_replace("_", "-", static::class);
@@ -307,7 +341,12 @@ abstract class Model
     public function toJson($where_clause = 1)
     {
         global $config;
-        $handler = new PDO('mysql:host=localhost;dbname='.$this->database,$config['database']['username'],$config['database']['password']);
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
         
         if (strpos(static::class, "_") !== false) {
             $table = str_replace("_", "-", static::class);
@@ -331,7 +370,12 @@ abstract class Model
         $val = str_replace(":", "", $values);
         $val = rtrim($val, ",");
     
-        $handler = new PDO('mysql:host=localhost;dbname='.$this->database,$config['database']['username'],$config['database']['password']);
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
         
         if (strpos(static::class, "_") !== false) {
             $table = str_replace("_", "-", static::class);

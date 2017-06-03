@@ -3,7 +3,7 @@ Please read full documentation:
 [Documentation Wiki](https://github.com/josephmancuso/DollarScore/wiki)  
 [Example of a self contained app](https://github.com/taloncode/mustache)
 
-<img src="https://img.shields.io/badge/PHP-5.6%2B-brightgreen.svg" alt="PHP Version">
+<img src="https://img.shields.io/badge/PHP-5.6%2B-brightgreen.svg" alt="PHP Version"> [![DUB](https://img.shields.io/dub/l/vibe-d.svg)]()
 
 ## About
 

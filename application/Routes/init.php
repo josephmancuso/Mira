@@ -180,6 +180,7 @@ class Render
     
     public static function view($template, $_ = "")
     {
+        extract($_);
         $app_name = explode('.', $template);
         
         if (count($app_name)) {
@@ -191,8 +192,7 @@ class Render
             }
         } else {
             $config = require '../../config/config.php';
-        }
-        
+        }        
         
         if ($config['header']) {
             $header = explode('.', $config['header']);
@@ -214,7 +214,33 @@ class Render
         if (count($template) > 1) {
             $app = $template[0];
             $app_template = $template[1];
-            include "../app/$app/templates/$app_template.php";
+
+            if (file_exists("../app/$app/templates/$app_template.blade.php")) {
+                $output = file_get_contents("../app/$app/templates/$app_template.blade.php");
+                $output = preg_replace("/{{/", '<?=', $output);
+                $output = preg_replace("/}}/", '?>', $output);
+
+                //$string = preg_match('/@go.+/', $output, $match, PREG_OFFSET_CAPTURE);
+                //$output = substr_replace($match[0][0]," @start",-1);
+                //$output = substr_replace($match[0][0],"<?php if(1)", 0);
+
+
+                $output = str_replace("@foreach", "<?php foreach(", $output);
+                $output = str_replace("@start", ") : ?> ", $output);
+                $output = str_replace("@endforeach", "<?php endforeach; ?>", $output);
+
+                $output = str_replace("@if", "<?php if(", $output);
+                $output = str_replace("@elseif", "<?php elseif(", $output);
+                $output = str_replace("@else", "<?php else : ?>", $output);
+                $output = str_replace("@endif", "<?php endif; ?>", $output);
+
+                //ob_end_clean();
+                echo eval(' ?>'.$output. ' ');
+            } else {
+                include "../app/$app/templates/$app_template.php";
+            }
+            
+            
         } else {
             // no template
             $app_template = $template[0];

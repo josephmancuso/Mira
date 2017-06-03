@@ -215,20 +215,17 @@ class Render
             $app = $template[0];
             $app_template = $template[1];
 
-            if (file_exists("../app/$app/templates/$app_template.blade.php")) {
-                $output = file_get_contents("../app/$app/templates/$app_template.blade.php");
+            if (file_exists("../app/$app/templates/$app_template.engine.php")) {
+                $output = file_get_contents("../app/$app/templates/$app_template.engine.php");
                 $output = preg_replace("/{{/", '<?=', $output);
                 $output = preg_replace("/}}/", '?>', $output);
 
-                //$string = preg_match('/@go.+/', $output, $match, PREG_OFFSET_CAPTURE);
-                //$output = substr_replace($match[0][0]," @start",-1);
-                //$output = substr_replace($match[0][0],"<?php if(1)", 0);
-
-
+                // convert foreach template tags
                 $output = str_replace("@foreach", "<?php foreach(", $output);
                 $output = str_replace("@start", ") : ?> ", $output);
                 $output = str_replace("@endforeach", "<?php endforeach; ?>", $output);
 
+                // convert if template tags
                 $output = str_replace("@if", "<?php if(", $output);
                 $output = str_replace("@elseif", "<?php elseif(", $output);
                 $output = str_replace("@else", "<?php else : ?>", $output);
@@ -239,8 +236,6 @@ class Render
             } else {
                 include "../app/$app/templates/$app_template.php";
             }
-            
-            
         } else {
             // no template
             $app_template = $template[0];

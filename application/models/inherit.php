@@ -480,18 +480,15 @@ abstract class Model
         try {
             if (!empty($this->arr)) {
                 $this->insert()->execute($this->arr);
-                echo "inserting";
             }
             
             if (!empty($this->update)) {
                 $this->update()->execute($this->update);
-                echo "updating";
             }
             $this->arr = array();
             $this->update = array();
             return true;
         } catch (Exception $e) {
-            echo $e;
             return false;
         }
     }

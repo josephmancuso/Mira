@@ -158,35 +158,36 @@ abstract class Model
             $method = str_replace("_", "", $method);
             
             $this->arr[$method] = $value[0];
+        } else {
+            // make this else here
+
+            // find the string contraint leagues_users_fk
+            // explode _
+            // $cl = new explode[1]();
+            // return $cl;
+
+            global $config;
+            $handler = new PDO(
+                'mysql:host=localhost;dbname='.
+                $this->database,
+                $config['database']['username'],
+                $config['database']['password']
+            );
+
+            $class_name = static::class;
+
+            $query = $handler->query("
+                SELECT `REFERENCED_TABLE_NAME` FROM 
+                `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE `
+                REFERENCED_TABLE_SCHEMA` = '$this->database' AND 
+                `TABLE_NAME` = '$class_name' AND 
+                `COLUMN_NAME` = '$method';
+                ");
+            
+            $reference_table = $query->fetchAll()[0]['REFERENCED_TABLE_NAME'];
+            $cl = new $reference_table();
+            return $cl;
         }
-        // make this else here
-
-        // find the string contraint leagues_users_fk
-        // explode _
-        // $cl = new explode[1]();
-        // return $cl;
-
-        global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
-
-        $class_name = static::class;
-
-        $query = $handler->query("
-            SELECT `REFERENCED_TABLE_NAME` FROM 
-            `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE `
-            REFERENCED_TABLE_SCHEMA` = '$this->database' AND 
-            `TABLE_NAME` = '$class_name' AND 
-            `COLUMN_NAME` = '$method';
-            ");
-        
-        $reference_table = $query->fetchAll()[0]['REFERENCED_TABLE_NAME'];
-        $cl = new $reference_table();
-        return $cl;
         //return $cl->getColumns();
     }
 
@@ -229,6 +230,7 @@ abstract class Model
         
         $newkey = str_replace(" ", ",", trim($newkey));
         
+        global $config;
         $handler = new PDO(
             'mysql:host=localhost;dbname='.
             $this->database,
@@ -370,6 +372,7 @@ abstract class Model
         $val = str_replace(":", "", $values);
         $val = rtrim($val, ",");
     
+        global $config;
         $handler = new PDO(
             'mysql:host=localhost;dbname='.
             $this->database,
@@ -416,6 +419,7 @@ abstract class Model
     
     public function delete($where_clause = 1)
     {
+        global $config;
         $handler = new PDO(
             'mysql:host=localhost;dbname='.
             $this->database,
@@ -434,6 +438,7 @@ abstract class Model
     
     public function deleteAll($where_clause = 1)
     {
+        global $config;
         $handler = new PDO(
             'mysql:host=localhost;dbname='.
             $this->database,
@@ -475,15 +480,18 @@ abstract class Model
         try {
             if (!empty($this->arr)) {
                 $this->insert()->execute($this->arr);
+                echo "inserting";
             }
             
             if (!empty($this->update)) {
                 $this->update()->execute($this->update);
+                echo "updating";
             }
             $this->arr = array();
             $this->update = array();
             return true;
         } catch (Exception $e) {
+            echo $e;
             return false;
         }
     }

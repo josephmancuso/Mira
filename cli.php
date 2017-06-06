@@ -76,6 +76,39 @@ class App
             echo "failed\n";
             $created = false;
         }
+        
+        echo "Creating app routes folder ... ";
+        if (mkdir("application/app/$input/routes")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
+        echo "Creating app routes/routes.php file ... ";
+        if (fopen("application/app/$input/routes/routes.php", "a")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+        
+        echo "Creating app model folder ... ";
+        if (mkdir("application/app/$input/models")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
+        echo "Creating app models/models.php file ... ";
+        if (fopen("application/app/$input/models/models.php", "a")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+        
 
         if ($created) {
             echo "\nApp Successfully Created!";

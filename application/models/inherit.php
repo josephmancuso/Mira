@@ -178,8 +178,8 @@ abstract class Model
 
             $query = $handler->query("
                 SELECT `REFERENCED_TABLE_NAME` FROM 
-                `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE `
-                REFERENCED_TABLE_SCHEMA` = '$this->database' AND 
+                `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE 
+                `REFERENCED_TABLE_SCHEMA` = '$this->database' AND 
                 `TABLE_NAME` = '$class_name' AND 
                 `COLUMN_NAME` = '$method';
                 ");

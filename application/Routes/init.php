@@ -10,6 +10,7 @@ class Route
     
     public static function get($url, Closure $func)
     {
+        //echo $_SERVER['REQUEST_METHOD'];
         
         $startDelimiter = "{";
         $endDelimiter = "}";
@@ -49,7 +50,6 @@ class Route
         $get_url = $_GET['url'];
         
         $params = explode("/", $_GET['url']);
-        
         //echo "<h1>".$match."</h1>";
         
         
@@ -63,6 +63,14 @@ class Route
             $i++;
         }
         
+        // add query string parameters to the global GET variable
+        $u = explode("?", $_SERVER['REQUEST_URI']);
+        $u = explode("&", $u[1]);
+        foreach ($u as $param) {
+            $param = explode("=", $param);
+            $_GET[$param[0]] = $param[1];
+        }
+
         if ($match == "$") {
             $match = "^$";
         }
@@ -141,6 +149,14 @@ class Route
                 $pos++;
             }
             $i++;
+        }
+
+        // add query string parameters to the global GET variable
+        $u = explode("?", $_SERVER['REQUEST_URI']);
+        $u = explode("&", $u[1]);
+        foreach ($u as $param) {
+            $param = explode("=", $param);
+            $_POST[$param[0]] = $param[1];
         }
         
         if ($match == "$") {

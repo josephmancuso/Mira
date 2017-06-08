@@ -1,10 +1,14 @@
 <?php
-
+error_reporting(0);
 unset($argv[0]);
 
 if (in_array("--new", $argv)) {
-    echo "App Name: ";
-    $input = str_replace(' ', '_', strtolower(trim(fgets(STDIN, 1024))));
+    if (!$argv[2]){
+        echo "App Name: ";
+        $input = str_replace(' ', '_', strtolower(trim(fgets(STDIN, 1024))));
+    } else {
+        $input = str_replace(' ', '_', $argv[2]);
+    }
     App::new($input);
 } elseif (in_array("--model", $argv)) {
     echo "Model / Table Name: ";

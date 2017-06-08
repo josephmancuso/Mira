@@ -133,7 +133,7 @@ abstract class Model
     
     public function setDatabase($database)
     {
-        $this->$database = $database;
+        $this->database = $database;
         return true;
     }
     

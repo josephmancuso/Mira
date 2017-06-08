@@ -108,6 +108,24 @@ class App
             echo "failed\n";
             $created = false;
         }
+
+        echo "Creating app middleware folder ... ";
+        if (mkdir("application/app/$input/middleware")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
+        echo "Creating app middleware/middleware.php file ... ";
+        if (fopen("application/app/$input/middleware/middleware.php", "a")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
+
         
 
         if ($created) {

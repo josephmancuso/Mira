@@ -194,7 +194,7 @@ class Render
         //
     }
     
-    public static function view($template, $_ = "")
+    public static function view($template, $_ = [])
     {
         extract($_);
         $app_name = explode('.', $template);

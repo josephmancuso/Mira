@@ -4,12 +4,10 @@ $config = require_once "../../config/config.php";
 
 abstract class Model
 {
-    
     public $database = null;
     public $arr = array();
     public $update = array();
     public $structure = array();
-    
     
     public function __construct($default_database = null)
     {
@@ -173,20 +171,59 @@ abstract class Model
                 $config['database']['username'],
                 $config['database']['password']
             );
-
+            //echo "<br>SELECT * FROM teams, info WHERE teams.pokemon = info.id<br>";
             $class_name = static::class;
-
             $query = $handler->query("
-                SELECT `REFERENCED_TABLE_NAME` FROM 
-                `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` WHERE 
-                `REFERENCED_TABLE_SCHEMA` = '$this->database' AND 
-                `TABLE_NAME` = '$class_name' AND 
-                `COLUMN_NAME` = '$method';
+                SELECT `REFERENCED_TABLE_NAME`, `REFERENCED_TABLE_SCHEMA`, `TABLE_SCHEMA` 
+                FROM `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` 
+                WHERE `TABLE_SCHEMA` = '$this->database' 
+                AND `TABLE_NAME` = '$class_name' 
+                AND `COLUMN_NAME` = '$method';
                 ");
+            /*
+            echo "SELECT `REFERENCED_TABLE_NAME`, `REFERENCED_TABLE_SCHEMA`, `TABLE_SCHEMA` 
+                FROM `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` 
+                WHERE `TABLE_SCHEMA` = '$this->database' 
+                AND `TABLE_NAME` = '$class_name' 
+                AND `COLUMN_NAME` = '$method'";
+            */
+            $key_table = $query->fetchAll()[0];
+
+            $reference_table = $key_table['REFERENCED_TABLE_NAME'];
+            $reference_schema = $key_table['REFERENCED_TABLE_SCHEMA'];
+            $table_schema = $key_table['TABLE_SCHEMA'];
+
+            //print_r($reference_schema = $query->fetchAll());
+            // get column name "name"
             
-            $reference_table = $query->fetchAll()[0]['REFERENCED_TABLE_NAME'];
-            $cl = new $reference_table();
-            return $cl;
+            // return single result?
+
+            //endstate
+            // $gym->eliteFour1Team(2)
+            // get 1
+            // returns where teams equals 1
+            
+            if (!$value) {
+                $cl = new $reference_table();
+                
+                //$cl->getColumnName();
+                $sql = "SELECT * FROM $table_schema.$class_name, $reference_schema.$reference_table WHERE $table_schema.$class_name.$method = $reference_schema.$reference_table.id";
+
+                return $cl->query($sql);
+            } elseif (is_integer($value)) {
+                $fk = $this->filter("id = '$value[0]' ")[0][$method];
+
+                $cl = new $reference_table();
+                return $cl->filter("id = '$fk' ")[0];
+            } else {
+                
+                $cl = new $reference_table();
+                //$cl->getColumnName();
+                $sql = "SELECT * FROM $class_name, $reference_table WHERE $class_name.$method = $reference_table.id AND $value[0]";
+
+                //echo "SELECT * FROM $class_name, $reference_table WHERE $class_name.$method = $reference_table.id AND $value[0]";
+                return $cl->query($sql);
+            }
         }
         //return $cl->getColumns();
     }
@@ -211,6 +248,31 @@ abstract class Model
         for ($i = 0; $i < $rs->columnCount(); $i++) {
             $col = $rs->getColumnMeta($i);
             //print_r($col);
+            $columns[] = $col['name'];
+        }
+        return $columns;
+    }
+
+    public function getColumnName()
+    {
+        global $config;
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+        
+        if (strpos(static::class, "_") !== false) {
+            $table = str_replace("_", "-", static::class);
+        } else {
+            $table = static::class;
+        }
+
+        $rs = $handler->query("SELECT * FROM $table LIMIT 1");
+        for ($i = 0; $i < $rs->columnCount(); $i++) {
+            $col = $rs->getColumnMeta($i);
+            print_r($col);
             $columns[] = $col['name'];
         }
         return $columns;
@@ -294,6 +356,7 @@ abstract class Model
     
     public function get($where_clause = 1)
     {
+        global $config;
         $handler = new PDO(
             'mysql:host=localhost;dbname='.
             $this->database,
@@ -360,6 +423,27 @@ abstract class Model
 
         return json_encode($query->fetchAll());
     }
+
+    public function query($sql, $where = '')
+    {
+        global $config;
+        $handler = new PDO(
+            'mysql:host=localhost;dbname='.
+            $this->database,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+        
+        if (strpos(static::class, "_") !== false) {
+            $table = str_replace("_", "-", static::class);
+        } else {
+            $table = static::class;
+        }
+
+        $query = $handler->query($sql." $where");
+        
+        return $query->fetchAll();
+    }
     
     #### UPDATE
     
@@ -385,8 +469,10 @@ abstract class Model
         } else {
             $table = static::class;
         }
-        
-        return $query = $handler->prepare("UPDATE `$table` SET $val WHERE $where_clause LIMIT 1");
+        $sql = "UPDATE `$table` SET $val WHERE $where_clause LIMIT 1";
+        return $query = $handler->query($sql);
+
+
     }
 
     public function updateFromPost($post, $where_clause = 1)

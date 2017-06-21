@@ -3,7 +3,7 @@ error_reporting(0);
 unset($argv[0]);
 
 if (in_array("--new", $argv)) {
-    if (!$argv[2]){
+    if (!$argv[2]) {
         echo "App Name: ";
         $input = str_replace(' ', '_', strtolower(trim(fgets(STDIN, 1024))));
     } else {
@@ -21,7 +21,22 @@ if (in_array("--new", $argv)) {
     $repo = explode("/", $argv[2]);
     $repo_user = $repo[0];
     $repo_name = $repo[1];
-    echo shell_exec("cd application/app && git clone https://github.com/$repo_user/$repo_name.git" );
+    echo shell_exec("cd application/app && git clone https://github.com/$repo_user/$repo_name.git");
+
+    if (file_exists("application/app/$repo_name/config.php")) {
+        $config = include("application/app/$repo_name/config.php");
+
+        if ($config['dependencies']['apps']) {
+            echo "------- DOWNLOADING APP DEPENDENCIES ------- \n";
+            foreach ($config['dependencies']['apps'] as $install) {
+                $repo = explode("/", $install);
+                $repo_user = $repo[0];
+                $repo_name = $repo[1];
+                echo "------- DOWNLOADING $repo_user / $repo_name ------- \n";
+                echo shell_exec("cd application/app && git clone https://github.com/$repo_user/$repo_name.git");
+            }
+        }
+    }
 } else {
     echo $argv[1]." is not a command.";
 }
@@ -128,9 +143,6 @@ class App
             echo "failed\n";
             $created = false;
         }
-
-
-        
 
         if ($created) {
             echo "\nApp Successfully Created!";

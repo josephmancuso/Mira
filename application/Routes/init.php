@@ -29,8 +29,6 @@ class Route
             $startFrom = $contentEnd + $endDelimiterLength;
         }
         
-        
-        
         $get_url_segments = explode("/", $url);
         
         $match = "";
@@ -68,6 +66,7 @@ class Route
         $u = explode("&", $u[1]);
         foreach ($u as $param) {
             $param = explode("=", $param);
+            $param[1] = str_replace('%20', ' ', $param[1]);
             $_GET[$param[0]] = $param[1];
         }
 
@@ -82,7 +81,7 @@ class Route
             $ex = explode("/", $_GET['url'], 2);
             echo $file = $ex[1];
             
-            
+
             echo "<h1>";
             
             echo "</h1>";
@@ -208,7 +207,7 @@ class Render
             }
         } else {
             $config = require '../../config/config.php';
-        }        
+        }
         
         if ($config['header']) {
             $header = explode('.', $config['header']);
@@ -301,5 +300,26 @@ class Render
     private function getFooter()
     {
         //
+    }
+}
+
+require_once 'init.php';
+require_once '../models/models.php';
+
+require_once '../forms/forms.php';
+
+if ($config['middleware']) {
+    foreach ($config['middleware'] as $template) {
+        if (file_exists("../app/$template/middleware/middleware.php")) {
+            require_once("../app/$template/middleware/middleware.php");
+        } elseif (file_exists("../middleware/$template/autoload.php")) {
+            require_once("../middleware/$template/autoload.php");
+        }
+    }
+}
+
+if ($config['templates']) {
+    foreach ($config['templates'] as $template) {
+        include_once("../app/$template/routes/routes.php");
     }
 }

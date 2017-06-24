@@ -37,6 +37,11 @@ if (in_array("--new", $argv)) {
             }
         }
     }
+} elseif (in_array("--middleware", $argv)) {
+    $repo = explode("/", $argv[2]);
+    $repo_user = $repo[0];
+    $repo_name = $repo[1];
+    echo shell_exec("cd application/middleware && git clone https://github.com/$repo_user/$repo_name.git");
 } else {
     echo $argv[1]." is not a command.";
 }

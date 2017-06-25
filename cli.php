@@ -100,6 +100,17 @@ class App
             echo "failed\n";
             $created = false;
         }
+
+        // Create css folder
+        echo "Creating app css folder ... ";
+        if (mkdir("application/app/$input/css")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
+
         
         echo "Creating app routes folder ... ";
         if (mkdir("application/app/$input/routes")) {
@@ -116,7 +127,23 @@ class App
             echo "failed\n";
             $created = false;
         }
-        
+
+        echo "Creating app controller folder ... ";
+        if (mkdir("application/app/$input/controller")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
+        echo "Creating app controller/controller.php file ... ";
+        if (fopen("application/app/$input/controller/controller.php", "a")) {
+            echo "created successfully!\n";
+        } else {
+            echo "failed\n";
+            $created = false;
+        }
+
         echo "Creating app model folder ... ";
         if (mkdir("application/app/$input/models")) {
             echo "created successfully!\n";

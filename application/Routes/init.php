@@ -302,8 +302,6 @@ class Render
         //
     }
 }
-
-require_once 'init.php';
 require_once '../models/models.php';
 
 require_once '../forms/forms.php';
@@ -320,6 +318,10 @@ if ($config['middleware']) {
 
 if ($config['templates']) {
     foreach ($config['templates'] as $template) {
+        if (file_exists("../app/$template/controllers/controller.php")) {
+            require_once("../app/$template/controllers/init.php");
+            require_once("../app/$template/controllers/controller.php");
+        }
         include_once("../app/$template/routes/routes.php");
     }
 }

@@ -1,12 +1,13 @@
-Please read full documentation:
-
-[Documentation Wiki](https://github.com/josephmancuso/Mira/wiki)  
-[Example of a self contained app](https://github.com/taloncode/mustache)
+<img src="Mira.png" alt="PHP Version" width="300px">
 
 <img src="https://img.shields.io/badge/PHP-5.6%2B-brightgreen.svg" alt="PHP Version"> [![DUB](https://img.shields.io/dub/l/vibe-d.svg)]()
 <img src="https://img.shields.io/badge/Coverage-None-lightgrey.svg" alt="PHP Version">
 <img src="https://img.shields.io/badge/stable-v0.1.0-blue.svg" alt="PHP Version">
 
+Please read full documentation:
+
+[Documentation Wiki](https://github.com/josephmancuso/Mira/wiki)  
+[Example of a self contained app](https://github.com/taloncode/mustache)
 
 ## About
 

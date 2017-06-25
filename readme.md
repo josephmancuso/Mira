@@ -21,7 +21,25 @@ $ git clone https://github.com/josephmancuso/Mira.git
 
 Take the contents of this repo you just cloned and put it into the root directory
 
-Then inside the root of the project (where `cli.php` is located)
+Add `mira` to the templates in your config file like so:
+
+```php
+return [
+    'database' => [
+        'username' => 'user',
+        'password' => 'password',
+    ],
+    'templates' => [
+        'mira',
+    ],
+    'header' => 'mira.base', // optional
+    'footer' => 'mira.footer', // optional
+];
+```
+
+### Install a self-contained app
+
+inside the root of the project (where `cli.php` is located)
 
 ```shell
 $ php cli.php --install taloncode/mustache
@@ -39,10 +57,11 @@ return [
         'password' => 'password',
     ],
     'templates' => [
+        'mira',
         'mustache',
     ],
-    'header' => 'dollarscore.base',
-    'footer' => 'dollarscore.footer',
+    'header' => 'mira.base',
+    'footer' => 'mira.footer',
 ];
 ```
 

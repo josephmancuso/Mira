@@ -21,12 +21,24 @@ abstract class Model
 
         // check if database exists
         global $config;
+        $connection = 'mysql:host=localhost;';
         $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
+            $connection,
             $config['database']['username'],
             $config['database']['password']
         );
+        if ($this->create == true) {
+            $handler->query("CREATE DATABASE IF NOT EXISTS ".$this->database);
+        }
+
+        $connection = 'mysql:host=localhost;dbname='.$this->database;
+        $handler = new PDO(
+            $connection,
+            $config['database']['username'],
+            $config['database']['password']
+        );
+
+
         $table = static::class;
         $query = $handler->query("SHOW TABLES LIKE '$table' ");
         

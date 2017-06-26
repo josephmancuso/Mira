@@ -131,6 +131,47 @@ or during instantiation:
 $model = new table("database_name");
 ```
 
+## Controllers
+
+Controller take on a new meaning in Mira
+
+Controllers can get really messy and the best way to create enterprise level software is to compartmentalize your software.
+
+In Mira, controllers aren't conventional classes, but they are closures that compartmentalize your Routes.
+
+This is an example of a controller in Mira:
+
+```php
+// the method for controller:: can be any name you want, it is more of a category name
+controller::name(function(){
+
+    // controller level variables
+    $posts = new posts();
+    $authors = new authors();
+
+    Routes::get('url/path/$', function() use ($authors){
+
+        Render::view('app.template', [
+            'authors' => $authors
+        ]);
+
+    });
+
+    Routes::get('url/path/posts/$', function() use ($posts, $authors){
+
+        Render::view('app.template2', [
+            'authors' => $authors,
+            'posts' => $posts
+        ]);
+
+    });
+
+
+});
+``` 
+
+Controllers in Mira just abstracts some of the logic for `Routes` class. Controllers just take multiple routers and match like normal Routes
+
 ## Apps
 
 Apps are designed to be complete containers. In other words, they are being designed to be drag and dropped into a project

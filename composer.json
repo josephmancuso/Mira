@@ -1,0 +1,16 @@
+{
+    "name": "mira/mira",
+    "description": "Mira is a PHP MVC Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joseph Mancuso",
+            "email": "joseph@orderinghero.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "phpunit/phpunit": "^6.2"
+    }
+}

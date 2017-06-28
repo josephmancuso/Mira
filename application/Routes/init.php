@@ -348,8 +348,8 @@ if ($config['middleware']) {
 
 if ($config['templates']) {
     foreach ($config['templates'] as $template) {
-        if (file_exists("../app/controllers/controller.php")) {
-            require_once("../app/controllers/init.php");
+        if (file_exists("../app/$template/controller/controller.php")) {
+            require_once("../controller/init.php");
             require_once("../app/$template/controller/controller.php");
         }
         include_once("../app/$template/routes/routes.php");

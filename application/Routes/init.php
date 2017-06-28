@@ -348,9 +348,9 @@ if ($config['middleware']) {
 
 if ($config['templates']) {
     foreach ($config['templates'] as $template) {
-        if (file_exists("../app/$template/controllers/controller.php")) {
-            require_once("../app/$template/controllers/init.php");
-            require_once("../app/$template/controllers/controller.php");
+        if (file_exists("../app/$template/controller/controller.php")) {
+            require_once("../app/$template/controller/init.php");
+            require_once("../app/$template/controller/controller.php");
         }
         include_once("../app/$template/routes/routes.php");
     }

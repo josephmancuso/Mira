@@ -10,6 +10,7 @@ class Route
     
     public static function get($url, Closure $func)
     {
+
         //echo $_SERVER['REQUEST_METHOD'];
         
         $startDelimiter = "{";
@@ -75,6 +76,7 @@ class Route
         }
         $_REQUEST['url'] = $_SERVER['REQUEST_URI'];
         //$z = 'jmancuso';
+
         if (preg_match("/^res/", $_GET['url'])) {
             echo $_SERVER['DOCUMENT_ROOT'];
             echo $_GET['url'];
@@ -83,7 +85,6 @@ class Route
             
 
             echo "<h1>";
-            
             echo "</h1>";
             if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
                 header('Content-Type:');
@@ -91,6 +92,7 @@ class Route
                 exit;
             }
         } elseif (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
+
             require_once 'extendsFrom.php';
         }
     }
@@ -208,12 +210,26 @@ class Render
         } else {
             $config = require '../../config/config.php';
         }
+
+        // Multi-tenancy
+        $url = $_SERVER['HTTP_HOST'];
+        $host = explode('.', $url);
+        $subdomain = $host[0];
+
+        $project_config = require '../../config/config.php';
+
+        $multi_tenancy = $project_config['multi-tenancy'];
         
         if ($config['header']) {
             $header = explode('.', $config['header']);
             
             if (count($header) > 1) {
-                $app = $header[0];
+                if ($multi_tenancy) {
+                    $app = $subdomain;
+                } else {
+                    $app = $header[0];
+                }
+                
                 $app_template = $header[1];
                 include_once "../app/$app/templates/$app_template.php";
             } else {
@@ -227,7 +243,11 @@ class Render
         $template = explode(".", $template);
         
         if (count($template) > 1) {
-            $app = $template[0];
+            if ($multi_tenancy) {
+                $app = $subdomain;
+            } else {
+                $app = $template[0];
+            }
             $app_template = $template[1];
 
             if (file_exists("../app/$app/templates/$app_template.engine.php")) {
@@ -275,7 +295,11 @@ class Render
             $footer = explode('.', $config['footer']);
             
             if (count($footer) > 1) {
-                $app = $footer[0];
+                if ($multi_tenancy) {
+                    $app = $subdomain;
+                } else {
+                    $app = $footer[0];
+                }
                 $app_template = $footer[1];
                 include_once "../app/$app/templates/$app_template.php";
             } else {
@@ -302,7 +326,11 @@ class Render
         //
     }
 }
-include_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
+
+if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
+    include_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
+}
+
 
 require_once '../models/models.php';
 

@@ -219,18 +219,24 @@ class Render
         $project_config = require '../../config/config.php';
 
         $multi_tenancy = $project_config['multi-tenancy'];
+        if (count($host) >= 3 && $subdomain != 'www') {
+            $multi_check = true;
+        } else {
+            $multi_check = false;
+        }
         
         if ($config['header']) {
             $header = explode('.', $config['header']);
             
             if (count($header) > 1) {
-                if ($multi_tenancy) {
+                if ($multi_tenancy && $multi_check) {
                     $app = $subdomain;
                 } else {
                     $app = $header[0];
                 }
                 
                 $app_template = $header[1];
+
                 include_once "../app/$app/templates/$app_template.php";
             } else {
                 // no template
@@ -243,7 +249,7 @@ class Render
         $template = explode(".", $template);
         
         if (count($template) > 1) {
-            if ($multi_tenancy) {
+            if ($multi_tenancy && $multi_check) {
                 $app = $subdomain;
             } else {
                 $app = $template[0];
@@ -295,7 +301,7 @@ class Render
             $footer = explode('.', $config['footer']);
             
             if (count($footer) > 1) {
-                if ($multi_tenancy) {
+                if ($multi_tenancy && $multi_check) {
                     $app = $subdomain;
                 } else {
                     $app = $footer[0];
@@ -347,11 +353,29 @@ if ($config['middleware']) {
 }
 
 if ($config['templates']) {
-    foreach ($config['templates'] as $template) {
-        if (file_exists("../app/$template/controller/controller.php")) {
-            require_once("../controller/init.php");
-            require_once("../app/$template/controller/controller.php");
-        }
-        include_once("../app/$template/routes/routes.php");
+    $url = $_SERVER['HTTP_HOST'];
+    $host = explode('.', $url);
+    $subdomain = $host[0];
+    if (count($host) >= 3 && $subdomain != 'www') {
+        $multi_check = true;
+    } else {
+        $multi_check = false;
     }
+
+    if ($config['multi-tenancy'] && $multi_check) {
+        if (file_exists("../app/$subdomain/controller/controller.php")) {
+            require_once("../controller/init.php");
+            require_once("../app/$subdomain/controller/controller.php");
+        }
+        include_once("../app/$subdomain/routes/routes.php");  
+    } else {
+        foreach ($config['templates'] as $template) {
+            if (file_exists("../app/$template/controller/controller.php")) {
+                require_once("../controller/init.php");
+                require_once("../app/$template/controller/controller.php");
+            }
+            include_once("../app/$template/routes/routes.php");
+        }
+    }
+    
 }

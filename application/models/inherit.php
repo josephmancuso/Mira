@@ -228,7 +228,6 @@ abstract class Model
                 $cl = new $reference_table();
                 return $cl->filter("id = '$fk' ")[0];
             } else {
-                
                 $cl = new $reference_table();
                 //$cl->getColumnName();
                 $sql = "SELECT * FROM $class_name, $reference_table WHERE $class_name.$method = $reference_table.id AND $value[0]";
@@ -249,9 +248,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -274,9 +279,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -311,7 +322,19 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
-        $table = static::class;
+
+        $table_name = static::class;
+        
+        if (strpos(static::class, "_") !== false) {
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
+        } else {
+            $table = static::class;
+        }
+
         $view_query = "INSERT INTO `$table` ($cols) VALUES($newkey)";
         return $query = $handler->prepare("INSERT INTO `$table` ($cols) VALUES($newkey)");
     }
@@ -337,7 +360,19 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
-        $table = static::class;
+
+        $table_name = static::class;
+
+        if (strpos(static::class, "_") !== false) {
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
+        } else {
+            $table = static::class;
+        }
+
         echo $view_query = "INSERT INTO `$table` ($cols) VALUES ($values)";
         return $query = $handler->query("INSERT INTO `$table` ($cols) VALUES ($values)");
     }
@@ -354,12 +389,20 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
+
+        echo $table;
         
         $query = $handler->query("SELECT * FROM `$table` WHERE 1");
         
@@ -375,9 +418,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -398,8 +447,15 @@ abstract class Model
         );
 
         $handler->errorInfo();
+
+        $table_name = static::class;
+
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -424,9 +480,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -445,9 +507,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -475,16 +543,21 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
+
         $sql = "UPDATE `$table` SET $val WHERE $where_clause LIMIT 1";
         return $query = $handler->query($sql);
-
-
     }
 
     public function updateFromPost($post, $where_clause = 1)
@@ -503,9 +576,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -524,9 +603,15 @@ abstract class Model
             $config['database']['username'],
             $config['database']['password']
         );
+
+        $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
@@ -544,11 +629,18 @@ abstract class Model
             $config['database']['password']
         );
 
+        $table_name = static::class;
+
         if (strpos(static::class, "_") !== false) {
-            $table = str_replace("_", "-", static::class);
+            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+                $table = str_replace("_", "-", static::class);
+            } else {
+                $table = static::class;
+            }
         } else {
             $table = static::class;
         }
+
         return $query = $handler->prepare("DELETE FROM `$table` WHERE $where_clause ");
     }
     

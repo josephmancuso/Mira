@@ -213,7 +213,7 @@ if ($config['templates']) {
 
     if ($config['multi-tenancy'] && $multi_check) {
         if (file_exists("../../app/$subdomain/controller/controller.php")) {
-            require_once("../../controller/init.php");
+            require_once("../controller/init.php");
             require_once("../../app/$subdomain/controller/controller.php");
         }
         include_once("../../app/$subdomain/routes/routes.php");

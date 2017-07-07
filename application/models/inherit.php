@@ -1,6 +1,6 @@
 <?php
 
-namespace Mira\Application\Model;
+namespace Mira;
 
 $config = require_once "../../config/config.php";
 
@@ -261,7 +261,7 @@ abstract class Model
         global $config;
 
         $table_name = static::class;
-        
+
         if (strpos(static::class, "_") !== false) {
             if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);

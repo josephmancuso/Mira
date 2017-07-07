@@ -1,18 +1,16 @@
 <?php
 
+namespace Mira;
+
 class Route
 {
-
     private function __construct()
     {
         //
     }
     
-    public static function get($url, Closure $func)
+    public static function get($url, \Closure $func)
     {
-
-        //echo $_SERVER['REQUEST_METHOD'];
-        
         $startDelimiter = "{";
         $endDelimiter = "}";
         
@@ -33,7 +31,7 @@ class Route
         $get_url_segments = explode("/", $url);
         
         $match = "";
-        //print_r($get_url_segments);
+        
         foreach ($get_url_segments as $segment) {
             if (strpos($segment, "{") !== false) {
                 $match .= ".*";
@@ -49,8 +47,6 @@ class Route
         $get_url = $_GET['url'];
         
         $params = explode("/", $_GET['url']);
-        //echo "<h1>".$match."</h1>";
-        
         
         $i = 0;
         $pos = 0;
@@ -75,7 +71,6 @@ class Route
             $match = "^$";
         }
         $_REQUEST['url'] = $_SERVER['REQUEST_URI'];
-        //$z = 'jmancuso';
 
         if (preg_match("/^res/", $_GET['url'])) {
             echo $_SERVER['DOCUMENT_ROOT'];
@@ -83,7 +78,6 @@ class Route
             $ex = explode("/", $_GET['url'], 2);
             echo $file = $ex[1];
             
-
             echo "<h1>";
             echo "</h1>";
             if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
@@ -92,12 +86,11 @@ class Route
                 exit;
             }
         } elseif (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
-
             require_once 'extendsFrom.php';
         }
     }
     
-    public static function post($url, Closure $func)
+    public static function post($url, \Closure $func)
     {
         $startDelimiter = "{";
         $endDelimiter = "}";
@@ -187,152 +180,6 @@ class Route
     }
 }
 
-class Render
-{
-    
-    private function __construct()
-    {
-        //
-    }
-    
-    public static function view($template, $_ = [])
-    {
-        extract($_);
-        $app_name = explode('.', $template);
-        
-        if (count($app_name)) {
-            $name = $app_name[0];
-            if (file_exists("../app/$name/config.php")) {
-                $config = include "../app/$name/config.php";
-            } else {
-                $config = require '../../config/config.php';
-            }
-        } else {
-            $config = require '../../config/config.php';
-        }
-
-        // Multi-tenancy
-        $url = $_SERVER['HTTP_HOST'];
-        $host = explode('.', $url);
-        $subdomain = $host[0];
-
-        $project_config = require '../../config/config.php';
-
-        $multi_tenancy = $project_config['multi-tenancy'];
-        if (count($host) >= 3 && $subdomain != 'www') {
-            $multi_check = true;
-        } else {
-            $multi_check = false;
-        }
-        
-        if ($config['header']) {
-            $header = explode('.', $config['header']);
-            
-            if (count($header) > 1) {
-                if ($multi_tenancy && $multi_check) {
-                    $app = $subdomain;
-                } else {
-                    $app = $header[0];
-                }
-                
-                $app_template = $header[1];
-
-                include_once "../app/$app/templates/$app_template.php";
-            } else {
-                // no template
-                $app_template = $header[0];
-                
-                include_once "../templates/$app_template.php";
-            }
-        }
-        
-        $template = explode(".", $template);
-        
-        if (count($template) > 1) {
-            if ($multi_tenancy && $multi_check) {
-                $app = $subdomain;
-            } else {
-                $app = $template[0];
-            }
-            $app_template = $template[1];
-
-            if (file_exists("../app/$app/templates/$app_template.engine.php")) {
-                $output = file_get_contents("../app/$app/templates/$app_template.engine.php");
-                $output = preg_replace("/{{/", '<?=', $output);
-                $output = preg_replace("/}}/", '?>', $output);
-
-                // convert foreach template tags
-                $output = str_replace("@foreach", "<?php foreach(", $output);
-                $output = str_replace("@start", ") : ?> ", $output);
-                $output = str_replace("@endforeach", "<?php endforeach; ?>", $output);
-
-                // convert if template tags
-                $output = str_replace("@if", "<?php if(", $output);
-                $output = str_replace("@elseif", "<?php elseif(", $output);
-                $output = str_replace("@else", "<?php else : ?>", $output);
-                $output = str_replace("@endif", "<?php endif; ?>", $output);
-
-                //ob_end_clean();
-                echo eval(' ?>'.$output. ' ');
-            } else {
-                include "../app/$app/templates/$app_template.php";
-            }
-        } else {
-            // no template
-            $app_template = $template[0];
-            
-            include "../templates/$app_template.php";
-        }
-        
-        //include("../templates/$template.php");
-        
-        if (count($app_name)) {
-            $name = $app_name[0];
-            if (file_exists("../app/$name/config.php")) {
-                $config = include "../app/$name/config.php";
-            } else {
-                $config = require '../../config/config.php';
-            }
-        } else {
-            $config = require '../../config/config.php';
-        }
-        
-        if ($config['footer']) {
-            $footer = explode('.', $config['footer']);
-            
-            if (count($footer) > 1) {
-                if ($multi_tenancy && $multi_check) {
-                    $app = $subdomain;
-                } else {
-                    $app = $footer[0];
-                }
-                $app_template = $footer[1];
-                include_once "../app/$app/templates/$app_template.php";
-            } else {
-                // no template
-                $app_template = $footer[0];
-                
-                include_once "../templates/$app_template.php";
-            }
-        }
-    }
-
-    public static function redirect($url)
-    {
-        Header("Location: $url");
-    }
-    
-    private function getHeader()
-    {
-        //
-    }
-    
-    private function getFooter()
-    {
-        //
-    }
-}
-
 if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
     include_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 }
@@ -341,6 +188,8 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
 require_once '../models/models.php';
 
 require_once '../forms/forms.php';
+
+require_once '../routes/render.php';
 
 if ($config['middleware']) {
     foreach ($config['middleware'] as $template) {
@@ -367,7 +216,7 @@ if ($config['templates']) {
             require_once("../controller/init.php");
             require_once("../app/$subdomain/controller/controller.php");
         }
-        include_once("../app/$subdomain/routes/routes.php");  
+        include_once("../app/$subdomain/routes/routes.php");
     } else {
         foreach ($config['templates'] as $template) {
             if (file_exists("../app/$template/controller/controller.php")) {
@@ -377,5 +226,4 @@ if ($config['templates']) {
             include_once("../app/$template/routes/routes.php");
         }
     }
-    
 }

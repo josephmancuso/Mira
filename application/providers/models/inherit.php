@@ -141,6 +141,13 @@ abstract class Model
     public function setDatabase($database)
     {
         $this->database = $database;
+
+        $connection = 'mysql:host=localhost;dbname='.$this->database;
+        $this->db_engine = new \PDO(
+            $connection,
+            $config['database']['username'],
+            $config['database']['password']
+        );
         return true;
     }
     

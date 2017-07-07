@@ -17,13 +17,13 @@ class Render
         
         if (count($app_name)) {
             $name = $app_name[0];
-            if (file_exists("../app/$name/config.php")) {
-                $config = include "../app/$name/config.php";
+            if (file_exists("../../app/$name/config.php")) {
+                $config = require "../../app/$name/config.php";
             } else {
-                $config = require '../../config/config.php';
+                $config = require '../../../config/config.php';
             }
         } else {
-            $config = require '../../config/config.php';
+            $config = require '../../../config/config.php';
         }
 
         // Multi-tenancy
@@ -31,7 +31,7 @@ class Render
         $host = explode('.', $url);
         $subdomain = $host[0];
 
-        $project_config = require '../../config/config.php';
+        $project_config = require '../../../config/config.php';
 
         $multi_tenancy = $project_config['multi-tenancy'];
         if (count($host) >= 3 && $subdomain != 'www') {
@@ -52,12 +52,12 @@ class Render
                 
                 $app_template = $header[1];
 
-                include_once "../app/$app/templates/$app_template.php";
+                include_once "../../app/$app/templates/$app_template.php";
             } else {
                 // no template
                 $app_template = $header[0];
                 
-                include_once "../templates/$app_template.php";
+                include_once "../../templates/$app_template.php";
             }
         }
         
@@ -90,7 +90,7 @@ class Render
                 //ob_end_clean();
                 echo eval(' ?>'.$output. ' ');
             } else {
-                include "../app/$app/templates/$app_template.php";
+                include "../../app/$app/templates/$app_template.php";
             }
         } else {
             // no template
@@ -103,13 +103,13 @@ class Render
         
         if (count($app_name)) {
             $name = $app_name[0];
-            if (file_exists("../app/$name/config.php")) {
-                $config = include "../app/$name/config.php";
+            if (file_exists("../../app/$name/config.php")) {
+                $config = include "../../app/$name/config.php";
             } else {
-                $config = require '../../config/config.php';
+                $config = require '../../../config/config.php';
             }
         } else {
-            $config = require '../../config/config.php';
+            $config = require '../../../config/config.php';
         }
         
         if ($config['footer']) {
@@ -122,7 +122,7 @@ class Render
                     $app = $footer[0];
                 }
                 $app_template = $footer[1];
-                include_once "../app/$app/templates/$app_template.php";
+                include_once "../../app/$app/templates/$app_template.php";
             } else {
                 // no template
                 $app_template = $footer[0];

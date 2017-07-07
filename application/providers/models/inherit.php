@@ -2,7 +2,7 @@
 
 namespace Mira;
 
-$config = require_once "../../config/config.php";
+$config = require_once "../../../config/config.php";
 
 abstract class Model
 {

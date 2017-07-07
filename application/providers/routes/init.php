@@ -193,10 +193,10 @@ require_once '../routes/render.php';
 
 if ($config['middleware']) {
     foreach ($config['middleware'] as $template) {
-        if (file_exists("../app/$template/middleware/middleware.php")) {
-            require_once("../app/$template/middleware/middleware.php");
-        } elseif (file_exists("../middleware/$template/autoload.php")) {
-            require_once("../middleware/$template/autoload.php");
+        if (file_exists("../../app/$template/middleware/middleware.php")) {
+            require_once("../../app/$template/middleware/middleware.php");
+        } elseif (file_exists("../../middleware/$template/autoload.php")) {
+            require_once("../../middleware/$template/autoload.php");
         }
     }
 }
@@ -212,18 +212,18 @@ if ($config['templates']) {
     }
 
     if ($config['multi-tenancy'] && $multi_check) {
-        if (file_exists("../app/$subdomain/controller/controller.php")) {
-            require_once("../controller/init.php");
-            require_once("../app/$subdomain/controller/controller.php");
+        if (file_exists("../../app/$subdomain/controller/controller.php")) {
+            require_once("../../controller/init.php");
+            require_once("../../app/$subdomain/controller/controller.php");
         }
-        include_once("../app/$subdomain/routes/routes.php");
+        include_once("../../app/$subdomain/routes/routes.php");
     } else {
         foreach ($config['templates'] as $template) {
-            if (file_exists("../app/$template/controller/controller.php")) {
+            if (file_exists("../../app/$template/controller/controller.php")) {
                 require_once("../controller/init.php");
-                require_once("../app/$template/controller/controller.php");
+                require_once("../../app/$template/controller/controller.php");
             }
-            include_once("../app/$template/routes/routes.php");
+            include_once("../../app/$template/routes/routes.php");
         }
     }
 }

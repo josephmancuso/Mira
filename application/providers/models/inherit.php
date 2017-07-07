@@ -142,6 +142,8 @@ abstract class Model
     {
         $this->database = $database;
 
+        global $config;
+
         $connection = 'mysql:host=localhost;dbname='.$this->database;
         $this->db_engine = new \PDO(
             $connection,

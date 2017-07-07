@@ -1,5 +1,7 @@
 <?php
 
+namespace Mira\Application\Model;
+
 $config = require_once "../../config/config.php";
 
 abstract class Model
@@ -8,6 +10,7 @@ abstract class Model
     public $arr = array();
     public $update = array();
     public $structure = array();
+    private $db_engine;
     
     public function __construct($default_database = null)
     {
@@ -22,32 +25,31 @@ abstract class Model
         // check if database exists
         global $config;
         $connection = 'mysql:host=localhost;';
-        $handler = new PDO(
+        $this->db_engine = new \PDO(
             $connection,
             $config['database']['username'],
             $config['database']['password']
         );
         if ($this->create == true) {
-            $handler->query("CREATE DATABASE IF NOT EXISTS ".$this->database);
+            $this->db_engine->query("CREATE DATABASE IF NOT EXISTS ".$this->database);
         }
 
         $connection = 'mysql:host=localhost;dbname='.$this->database;
-        $handler = new PDO(
+        $this->db_engine = new \PDO(
             $connection,
             $config['database']['username'],
             $config['database']['password']
         );
 
-
         $table = static::class;
-        $query = $handler->query("SHOW TABLES LIKE '$table' ");
+        $query = $this->db_engine->query("SHOW TABLES LIKE '$table' ");
         
         // query the database
         // get the columns and echo them
         
         if ($this->create == true && $query->rowCount()) {
             // the table exists and create is true. try and add the columns
-            $query = $handler->query("SELECT * FROM $table WHERE 1");
+            $query = $this->db_engine->query("SELECT * FROM $table WHERE 1");
             $get_column = $query->GetColumnMeta(1);
             
             // match the get column ['name'] to each element in the array.
@@ -80,7 +82,7 @@ abstract class Model
                         }
                         
                         // modify table
-                        if ($handler->query("ALTER TABLE $table CHANGE $old_column $column_name $data_type")) {
+                        if ($this->db_engine->query("ALTER TABLE $table CHANGE $old_column $column_name $data_type")) {
                                 //
                         } else {
                             if ($data_type === "varchar") {
@@ -96,7 +98,7 @@ abstract class Model
                             }
                             
                             
-                            $handler->query("ALTER TABLE $table ADD $column_name $data_type");
+                            $this->db_engine->query("ALTER TABLE $table ADD $column_name $data_type");
                         }
                         // add column
                     }
@@ -109,14 +111,9 @@ abstract class Model
         if (!$query->rowCount() && $this->create == true) {
             // check if database exists
             global $config;
-            $handler = new PDO(
-                'mysql:host=localhost;dbname='.
-                $this->database,
-                $config['database']['username'],
-                $config['database']['password']
-            );
+
             $table = static::class;
-            $query = $handler->query("SHOW TABLES LIKE '$table' ");
+            $query = $this->db_engine->query("SHOW TABLES LIKE '$table' ");
             
             // Construct a query
             $testing = get_class_vars(static::class);
@@ -135,7 +132,7 @@ abstract class Model
             $query_s .= ")";
             
             // table does not exist, create the table
-            $handler->query($query_s);
+            $this->db_engine->query($query_s);
         }
 
         return static::class;
@@ -177,15 +174,10 @@ abstract class Model
             // return $cl;
 
             global $config;
-            $handler = new PDO(
-                'mysql:host=localhost;dbname='.
-                $this->database,
-                $config['database']['username'],
-                $config['database']['password']
-            );
+
             //echo "<br>SELECT * FROM teams, info WHERE teams.pokemon = info.id<br>";
             $class_name = static::class;
-            $query = $handler->query("
+            $query = $this->db_engine->query("
                 SELECT `REFERENCED_TABLE_NAME`, `REFERENCED_TABLE_SCHEMA`, `TABLE_SCHEMA` 
                 FROM `INFORMATION_SCHEMA`.`KEY_COLUMN_USAGE` 
                 WHERE `TABLE_SCHEMA` = '$this->database' 
@@ -242,17 +234,11 @@ abstract class Model
     public function getColumns()
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -261,7 +247,7 @@ abstract class Model
             $table = static::class;
         }
 
-        $rs = $handler->query("SELECT * FROM $table LIMIT 1");
+        $rs = $this->db_engine->query("SELECT * FROM $table LIMIT 1");
         for ($i = 0; $i < $rs->columnCount(); $i++) {
             $col = $rs->getColumnMeta($i);
             //print_r($col);
@@ -273,17 +259,11 @@ abstract class Model
     public function getColumnName()
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -292,7 +272,7 @@ abstract class Model
             $table = static::class;
         }
 
-        $rs = $handler->query("SELECT * FROM $table LIMIT 1");
+        $rs = $this->db_engine->query("SELECT * FROM $table LIMIT 1");
         for ($i = 0; $i < $rs->columnCount(); $i++) {
             $col = $rs->getColumnMeta($i);
             print_r($col);
@@ -315,18 +295,12 @@ abstract class Model
         
         $newkey = str_replace(" ", ",", trim($newkey));
         
-        global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
+        global $config; 
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -336,7 +310,7 @@ abstract class Model
         }
 
         $view_query = "INSERT INTO `$table` ($cols) VALUES($newkey)";
-        return $query = $handler->prepare("INSERT INTO `$table` ($cols) VALUES($newkey)");
+        return $query = $this->db_engine->prepare("INSERT INTO `$table` ($cols) VALUES($newkey)");
     }
 
     public function insertFromPost($post)
@@ -354,17 +328,11 @@ abstract class Model
         $values = ltrim($values, ",");
 
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
 
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -374,7 +342,7 @@ abstract class Model
         }
 
         echo $view_query = "INSERT INTO `$table` ($cols) VALUES ($values)";
-        return $query = $handler->query("INSERT INTO `$table` ($cols) VALUES ($values)");
+        return $query = $this->db_engine->query("INSERT INTO `$table` ($cols) VALUES ($values)");
     }
 
 
@@ -383,17 +351,12 @@ abstract class Model
     public function all()
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
+        //$this->db_engine = $this->db_engine;
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -404,7 +367,7 @@ abstract class Model
 
         echo $table;
         
-        $query = $handler->query("SELECT * FROM `$table` WHERE 1");
+        $query = $this->db_engine->query("SELECT * FROM `$table` WHERE 1");
         
         return $query->fetchAll();
     }
@@ -412,17 +375,11 @@ abstract class Model
     public function get($where_clause = 1)
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -431,7 +388,7 @@ abstract class Model
             $table = static::class;
         }
         
-        $query = $handler->query('SELECT * FROM `'.$table.'` WHERE '.$where_clause.' LIMIT 1');
+        $query = $this->db_engine->query('SELECT * FROM `'.$table.'` WHERE '.$where_clause.' LIMIT 1');
         
         return $query->fetchAll();
     }
@@ -439,19 +396,13 @@ abstract class Model
     public function filter($where_clause = null)
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
-        $handler->errorInfo();
+        $this->db_engine->errorInfo();
 
         $table_name = static::class;
 
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -460,7 +411,7 @@ abstract class Model
             $table = static::class;
         }
         
-        $query = $handler->query("SELECT * FROM $table WHERE $where_clause");
+        $query = $this->db_engine->query("SELECT * FROM $table WHERE $where_clause");
         $this->structure = array();
         //echo $query->columnCount();
 
@@ -474,17 +425,11 @@ abstract class Model
     public function toJson($where_clause = 1)
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -493,7 +438,7 @@ abstract class Model
             $table = static::class;
         }
         
-        $query = $handler->query("SELECT * FROM $table WHERE $where_clause");
+        $query = $this->db_engine->query("SELECT * FROM $table WHERE $where_clause");
 
         return json_encode($query->fetchAll());
     }
@@ -501,17 +446,11 @@ abstract class Model
     public function query($sql, $where = '')
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -520,7 +459,7 @@ abstract class Model
             $table = static::class;
         }
 
-        $query = $handler->query($sql." $where");
+        $query = $this->db_engine->query($sql." $where");
         
         return $query->fetchAll();
     }
@@ -537,17 +476,11 @@ abstract class Model
         $val = rtrim($val, ",");
     
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -557,7 +490,7 @@ abstract class Model
         }
 
         $sql = "UPDATE `$table` SET $val WHERE $where_clause LIMIT 1";
-        return $query = $handler->query($sql);
+        return $query = $this->db_engine->query($sql);
     }
 
     public function updateFromPost($post, $where_clause = 1)
@@ -570,17 +503,11 @@ abstract class Model
         $val = rtrim($val, ",");
 
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -589,7 +516,7 @@ abstract class Model
             $table = static::class;
         }
         
-        return $query = $handler->query("UPDATE `$table` SET $val WHERE $where_clause LIMIT 1");
+        return $query = $this->db_engine->query("UPDATE `$table` SET $val WHERE $where_clause LIMIT 1");
     }
     
     #### DELETE
@@ -597,17 +524,11 @@ abstract class Model
     public function delete($where_clause = 1)
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
         
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -616,23 +537,17 @@ abstract class Model
             $table = static::class;
         }
         
-        return $query = $handler->prepare("DELETE FROM `$table` WHERE $where_clause LIMIT 1");
+        return $query = $this->db_engine->prepare("DELETE FROM `$table` WHERE $where_clause LIMIT 1");
     }
     
     public function deleteAll($where_clause = 1)
     {
         global $config;
-        $handler = new PDO(
-            'mysql:host=localhost;dbname='.
-            $this->database,
-            $config['database']['username'],
-            $config['database']['password']
-        );
 
         $table_name = static::class;
 
         if (strpos(static::class, "_") !== false) {
-            if ($handler->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
+            if ($this->db_engine->query("SHOW TABLES LIKE '$table_name' ")->num_rows) {
                 $table = str_replace("_", "-", static::class);
             } else {
                 $table = static::class;
@@ -641,7 +556,7 @@ abstract class Model
             $table = static::class;
         }
 
-        return $query = $handler->prepare("DELETE FROM `$table` WHERE $where_clause ");
+        return $query = $this->db_engine->prepare("DELETE FROM `$table` WHERE $where_clause ");
     }
     
     public function confirm()

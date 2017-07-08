@@ -119,9 +119,18 @@ class Render
         $output = self::register("/{{/", '<?=', $output);
         $output = self::register("/}}/", '?>', $output);                
         
-        $output = self::register('/(\s*)@(if|elseif|foreach|for|while)(\s*\(.*\))/', '$1<?php $2$3: ?>', $output);
+        $output = self::register(self::matcher("(if|elseif|foreach|for|while)"), '$1<?php $2$3: ?>', $output);
 
-        return $output = self::register('/(\s*)@(endif|endforeach|endfor|endwhile)(\s*)/', '$1<?php $2; ?>$3', $output);
+        $output = self::register("/(\s*)@(else)(\s*)/", '$1<?php $2: ?>$3', $output);
+
+        $output = self::register('/(\s*)@(endif|endforeach|endfor|endwhile)(\s*)/', '$1<?php $2; ?>$3', $output);
+
+        return $output = self::register(self::matcher('extends'), '$1<?php Mira\\Render::templateExtends($2) ?>', $output);
+    }
+
+    public static function matcher($function)
+    {
+        return '/(\s*)@'.$function.'(\s*\(.*\))/';
     }
     
     public function getHeader($config)
@@ -165,5 +174,14 @@ class Render
                 echo "no template";
             }
         }
+    }
+
+    public static function templateExtends($template)
+    {
+        $template = explode('.', $template);
+        //print_r($template);
+        echo $app = $template[0];
+        $app_template = $template[1];
+        include $_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.php";
     }
 }

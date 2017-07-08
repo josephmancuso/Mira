@@ -192,8 +192,7 @@ class Render
     public static function templateExtends($template)
     {
         $template = explode('.', $template);
-        //print_r($template);
-        echo $app = $template[0];
+        $app = $template[0];
         $app_template = $template[1];
         include $_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.php";
     }

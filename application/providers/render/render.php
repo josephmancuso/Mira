@@ -125,6 +125,13 @@ class Render
 
         $output = self::register('/(\s*)@(endif|endforeach|endfor|endwhile)(\s*)/', '$1<?php $2; ?>$3', $output);
 
+        $output = self::register("/(\s*)@(comment)/", '$1<?php if (0): ?>', $output);
+
+        $output = self::register("/(\s*)@(endcomment)/", "<?php endif; ?>", $output);
+
+
+        $output = self::register(self::matcher('iteration'), "1", $output);
+
         return $output = self::register(self::matcher('extends'), '$1<?php Mira\\Render::templateExtends($2) ?>', $output);
     }
 

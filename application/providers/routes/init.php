@@ -181,9 +181,10 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
 }
 
 $config = require_once $_SERVER['DOCUMENT_ROOT']."/config/config.php";
+$providers_config = require_once $_SERVER['DOCUMENT_ROOT']."/config/providers.php";
 
-if ($config['providers']) {
-    foreach ($config['providers'] as $provider) {
+if ($providers_config['Providers']) {
+    foreach ($providers_config['Providers'] as $provider) {
         $provider = strtolower(str_replace("\\", "/", $provider));
         require_once $_SERVER['DOCUMENT_ROOT']."/$provider/autoload.php";
     }

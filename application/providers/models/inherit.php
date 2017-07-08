@@ -2,9 +2,9 @@
 
 namespace Mira;
 
-$config = require_once "../../../config/config.php";
+$config = require_once $_SERVER['DOCUMENT_ROOT']."/config/config.php";
 
-abstract class Model
+class Model
 {
     public $database = null;
     public $arr = array();

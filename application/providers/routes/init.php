@@ -167,10 +167,6 @@ class Route
             $ex = explode("/", $_GET['url'], 2);
             echo $file = $ex[1];
             
-            
-            echo "<h1>";
-            
-            echo "</h1>";
             if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
                 header('Content-Type:');
                 readfile($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI']);
@@ -184,12 +180,14 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
     include_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 }
 
+$config = require_once $_SERVER['DOCUMENT_ROOT']."/config/config.php";
 
-require_once '../models/models.php';
-
-require_once '../forms/forms.php';
-
-require_once '../routes/render.php';
+if ($config['providers']) {
+    foreach ($config['providers'] as $provider) {
+        $provider = strtolower(str_replace("\\", "/", $provider));
+        require_once $_SERVER['DOCUMENT_ROOT']."/$provider/autoload.php";
+    }
+}
 
 if ($config['middleware']) {
     foreach ($config['middleware'] as $template) {

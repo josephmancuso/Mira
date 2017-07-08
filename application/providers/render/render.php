@@ -129,6 +129,10 @@ class Render
 
         $output = self::register("/(\s*)@(endcomment)/", "<?php endif; ?>", $output);
 
+        $output = self::register('/(\s*)@unless(\s*\(.*\))/', "$1<?php if ( ! ($2)): ?>", $output);
+
+        $output = self::register('/(\s*)@(endunless)(\s*)/', '<?php endif; ?>', $output);
+
         $output = self::register("/(\s*)@(use)(\s.*)/", "<?php use $3; ?>", $output);
 
 

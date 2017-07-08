@@ -80,6 +80,7 @@ class Render
         }
 
         self::getFooter($config);
+        die();
     }
 
     public static function redirect($url)
@@ -87,20 +88,21 @@ class Render
         Header("Location: $url");
     }
 
-    public static function getTemplate($app, $app_template, $_)
+    public static function getTemplate($app, $app_template, $variables)
     {
+        extract($variables);
         include $_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.php";
     }
 
     public static function templateEngine($template, $variables)
     {
+        extract($variables);
         if (self::multiTenancy()) {
                 $app = self::getSubdomain();
             } else {
                 $app = $template[0];
             }
             $app_template = $template[1];
-
             if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.engine.php")) {
                 $output = file_get_contents($_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.engine.php");
                 

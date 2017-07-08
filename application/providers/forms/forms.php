@@ -1,5 +1,7 @@
 <?php
 
+namespace Mira;
+
 class Form
 {
     public static function start($action, $method)

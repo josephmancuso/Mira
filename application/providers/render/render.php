@@ -129,6 +129,8 @@ class Render
 
         $output = self::register("/(\s*)@(endcomment)/", "<?php endif; ?>", $output);
 
+        $output = self::register("/(\s*)@(use)(\s.*)/", "<?php use $3; ?>", $output);
+
 
         $output = self::register(self::matcher('iteration'), "1", $output);
 

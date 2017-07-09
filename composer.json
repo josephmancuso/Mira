@@ -6,11 +6,11 @@
     "authors": [
         {
             "name": "Joseph Mancuso",
-            "email": "joseph@orderinghero.com"
+            "email": "jmancuso.mil@gmail.com"
         }
     ],
     "minimum-stability": "stable",
     "require": {
-        "phpunit/phpunit": "^6.2"
+        "miraframework/installer": "^0.1.0"
     }
 }

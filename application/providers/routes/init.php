@@ -219,7 +219,6 @@ if ($config['templates']) {
     } else {
         foreach ($config['templates'] as $template) {
             if (file_exists("../../app/$template/controller/controller.php")) {
-                require_once("../controller/init.php");
                 require_once("../../app/$template/controller/controller.php");
             }
             include_once("../../app/$template/routes/routes.php");

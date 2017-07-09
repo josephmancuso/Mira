@@ -18,6 +18,12 @@ Download the latest release from this repo
 
 Unzip the download and put all the folder contents inside your root directory or folder you wish to install Mira into.
 
+Then run:
+
+    $ composer install
+
+Open up a browser and navigation to your localhost.
+
 ### Install a self-contained app
 
 inside the root of the project (where `cli.php` is located)

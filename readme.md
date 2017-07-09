@@ -55,7 +55,7 @@ More information inside the wiki
 ```php
 // application/Routes.php
 
-use Mira\Routes;
+use Mira\Route;
 use Mira\Render;
 
 Route::get("path/to/url", function(){

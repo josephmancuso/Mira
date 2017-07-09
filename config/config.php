@@ -6,7 +6,5 @@ return [
     ],
     'templates' => [
         'mira',
-    ],
-    'header' => 'dollarscore.base',
-    'footer' => 'dollarscore.footer',
+    ]
 ];

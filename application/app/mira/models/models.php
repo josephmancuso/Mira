@@ -1,8 +1,9 @@
 <?php
 
 use Mira\Model as Model;
-
-class so_item extends Model
+/*
+class tableName extends Model
 {
-    protected $db = "dev_lilypad";
+    protected $db = "databaseName";
 }
+*/

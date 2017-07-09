@@ -10,31 +10,13 @@ Please read full documentation:
 
 ## About
 
-Mira is a PHP MVC motivated by the Python Django MVC Framework. The goal is to create an MVC that supports self contained apps, has an admin panel, and eventually a full CMS with plugins and themes.
+Mira is a PHP MVC motivated by self contained applications. The goal is to create an MVC that supports self contained apps and service providers to simply and easily add functionality between Mira framework installs.
 
 ## Installation
 
-```shell
-$ git clone https://github.com/josephmancuso/Mira.git
-```
+Download the latest release from this repo
 
-Take the contents of this repo you just cloned and put it into the root directory
-
-Add `mira` to the templates in your config file like so:
-
-```php
-return [
-    'database' => [
-        'username' => 'user',
-        'password' => 'password',
-    ],
-    'templates' => [
-        'mira',
-    ],
-    'header' => 'mira.base', // optional
-    'footer' => 'mira.footer', // optional
-];
-```
+Unzip the download and put all the folder contents inside your root directory or folder you wish to install Mira into.
 
 ### Install a self-contained app
 
@@ -45,7 +27,7 @@ $ php cli.php --install taloncode/mustache
 ```
 This will install an app from GitHub into your project 
 
-Then add mustache to the main config file inside a templates array so the routes are added to your main routes file like so:
+Then add mustache to the main config file inside a templates array ABOVE mira so the routes are added to your main routes file like so:
 
 (inside `config/config.php`).
 
@@ -56,11 +38,9 @@ return [
         'password' => 'password',
     ],
     'templates' => [
-        'mira',
         'mustache',
-    ],
-    'header' => 'mira.base',
-    'footer' => 'mira.footer',
+        'mira',
+    ]
 ];
 ```
 
@@ -74,6 +54,9 @@ More information inside the wiki
 
 ```php
 // application/Routes.php
+
+use Mira\Routes;
+use Mira\Render;
 
 Route::get("path/to/url", function(){
      Render::view("appname.template", 
@@ -89,6 +72,9 @@ You can also get certain values from the URL and pass them to your view or use t
 
 ```php
 // application/Routes.php
+
+use Mira\Route;
+use Mira\Render;
 
 // URL: website.com/baseball/player/123/
 Route::get("baseball/player/{id}/", function($id){
@@ -108,6 +94,9 @@ Route::get("baseball/player/{id}/", function($id){
 
 ```php
 // models/models.php
+
+use Mira\Model;
+
 class table extends Model{}
 ```
 
@@ -117,6 +106,8 @@ Inside the class:
 
 ```php
 // models.php
+
+use Mira\Model;
 
 class table extends Model{
     protected $db = "database_name";
@@ -143,6 +134,10 @@ This is an example of a controller in Mira:
 
 ```php
 // the method for controller:: can be any name you want, it is more of a category name
+
+use Mira\Route;
+use Mira\Render;
+
 controller::name(function(){
 
     // controller level variables
@@ -178,9 +173,11 @@ Apps are designed to be complete containers. In other words, they are being desi
 
 ### Creating an app
 
-To create an app, create a folder with the app name into the `application/app/` directory
+To create an app, go to the command line and go to the root of your project.
 
-Inside that directory, create a `templates` directory as well as a `config.php` file.
+    $ php cli.php --new appname
+
+This will create a new app in the app folder and put all needed files inside it.
 
 ### Config file
 
@@ -215,7 +212,7 @@ this will install an pre made app into your `app` directory
 
 ### Linking the Router
 
-Each app can have its own router added to the main `application/Routes/routes.php` file. 
+Each app can have its own router added to the main Routes file. 
 
 Open up your main `config/config.php` file and add a `templates` array to the file like so:
 
@@ -244,6 +241,10 @@ A route and template example might look like this:
 
 ```php
 // inside Routes/route.pgp
+
+use Mira\Route;
+use Mira\Render;
+
 Route::get("baseball/player/{id}/$", function(){
     $player = new player();
     $players = $player->filter(" id = '$id' ");
@@ -259,7 +260,15 @@ then inside your template:
 ```php
 // inside application/app/baseball/templates/player-roster.php
 
-foreach ($_['players'] as $player) {
+foreach ($players as $player) {
     echo $player['id'];
 }
+```
+
+if you end your template in `.engine.php` then you can also do:
+
+```php
+@foreach ($players as $player)
+    {{ $player }}
+@endforeach
 ```

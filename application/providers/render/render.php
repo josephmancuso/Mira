@@ -20,6 +20,12 @@ class Render
         //
     }
 
+    /**
+     * Check if multi-tenancy => true in the project config file
+     *
+     * @return bool
+     **/
+
     public function multiTenancy()
     {
         // Multi-tenancy
@@ -31,6 +37,14 @@ class Render
         }
         return false;
     }
+
+    /**
+     * Check if the template has its own config file then include that
+     * else include a project wide config file.
+     *
+     * @param $template - an app name
+     * @return config file
+     **/
 
     public static function getConfig($template)
     {
@@ -48,6 +62,13 @@ class Render
         }
     }
 
+    /**
+     * Get the subdomain from the url
+     *
+     * @return subdomain - first section of url
+     * @see multiTenancy()
+     **/
+
     public static function getSubdomain()
     {
         // Multi-tenancy
@@ -56,10 +77,28 @@ class Render
         return $subdomain = $host[0];
     }
 
+    /**
+     * undocumented function
+     *
+     * @param $pattern - a regex expression
+     * @param $replace - a replacement for the output
+     * @param $output - take input from file_get_contents() @see view()
+     * @return $output - a preg_replace template tag
+     * @see templateTags()
+     **/
+
     public static function register($pattern, $replace, $output)
     {
         return $output = preg_replace($pattern, $replace, $output);
     }
+
+    /**
+     * Render a view
+     *
+     * @param $template - app.template string
+     * @param $variables (array) - an array of variables to pass to view
+     * @return null
+     **/
     
     public static function view($template, $variables = [])
     {
@@ -83,10 +122,26 @@ class Render
         die();
     }
 
+    /**
+     * undocumented function
+     *
+     * @param $url - /normal/url/
+     * @return header
+     **/
     public static function redirect($url)
     {
         Header("Location: $url");
     }
+
+    /**
+     * undocumented function
+     *
+     * @param $app - app name
+     * @param $app_template - app template
+     * @param $variables (array) - array of variables to pass to template
+     * @return template file
+     * @see templateEngine()
+     **/
 
     public static function getTemplate($app, $app_template, $variables)
     {
@@ -94,33 +149,58 @@ class Render
         include $_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.php";
     }
 
+    /**
+     * The engine to power the template syntax. Replaces template syntax
+     * with valid PHP code
+     *
+     * 1. Gets the file_get_contents of the template
+     * 2. Then runs templateTags() which preg_replaces the output
+     * 3. Then returns the eval of the replaced template syntax
+     *
+     * @param $template - takes an exploded() template
+     * @param $variables (array) - array of variables to pass to view
+     * @return php eval code for Comet template syntax engine
+     * @see templateTags()
+     **/
+
     public static function templateEngine($template, $variables)
     {
         extract($variables);
         if (self::multiTenancy()) {
-                $app = self::getSubdomain();
-            } else {
-                $app = $template[0];
-            }
-            $app_template = $template[1];
-            if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.engine.php")) {
-                $output = file_get_contents($_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.engine.php");
-                
-                $output = self::templateTags($output);
-                
-                echo eval(' ?>'.$output. ' ');
-            } else {
-                //include $_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.php";
-                self::getTemplate($app, $app_template, $variables);
-            }
+            $app = self::getSubdomain();
+        } else {
+            $app = $template[0];
+        }
+        $app_template = $template[1];
+        if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.engine.php")) {
+            $output = file_get_contents($_SERVER['DOCUMENT_ROOT']."/application/app/$app/templates/$app_template.engine.php");
+            
+            $output = self::templateTags($output);
+            
+            echo eval(' ?>'.$output. ' ');
+        } else {
+            self::getTemplate($app, $app_template, $variables);
+        }
     }
+
+    /**
+     * Function registers template tags for the Comet template engine.
+     *
+     * This function takes $output as a paramter which is from a
+     * file_get_contents() function. This function processes the
+     * $output variable and returns the last $output which will
+     * preg_replace() all the template engine syntax.
+     *
+     * @param $output - a file_get_contents() of the template
+     * @return output file
+     * @see view()
+     **/
 
     public static function templateTags($output)
     {
         // register template tags
         $output = self::register("/{{/", '<?=', $output);
-        $output = self::register("/}}/", '?>', $output);                
-        
+        $output = self::register("/}}/", '?>', $output);
         $output = self::register(self::matcher("(if|elseif|foreach|for|while)"), '$1<?php $2$3: ?>', $output);
 
         $output = self::register("/(\s*)@(else)(\s*)/", '$1<?php $2: ?>$3', $output);
@@ -143,9 +223,17 @@ class Render
         return $output = self::register(self::matcher('extends'), '$1<?php Mira\\Render::templateExtends($2) ?>', $output);
     }
 
-    public static function matcher($function)
+    /**
+     * Returns a pattern that matches expressions such as @tag('')
+     *
+     * @param $tag - the tag name to match such as extends, 
+     * @return regex pattern
+     * @see templateTags()
+     **/
+
+    public static function matcher($tag)
     {
-        return '/(\s*)@'.$function.'(\s*\(.*\))/';
+        return '/(\s*)@'.$tag.'(\s*\(.*\))/';
     }
     
     public function getHeader($config)
@@ -154,7 +242,6 @@ class Render
             $header = explode('.', $config['header']);
 
             if (count($header) > 1) {
-
                 if (self::multiTenancy()) {
                     $app = self::getSubdomain();
                 } else {
@@ -190,6 +277,14 @@ class Render
             }
         }
     }
+
+    /**
+     * function for @extends() template syntax
+     *
+     * @param $template - app.template
+     * @return the template
+     * @see templateTags()
+     **/
 
     public static function templateExtends($template)
     {

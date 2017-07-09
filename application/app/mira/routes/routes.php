@@ -1,5 +1,9 @@
 <?php
+use Mira\Route;
+use Mira\Render;
+use Mira\Http;
 
-Route::get('home/$', function () {
-    Render::view('mira.home');
+get('home/$', function () {
+    $so_item = new so_item();
+    view('mira.home');
 });

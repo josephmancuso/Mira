@@ -180,6 +180,11 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
     include_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 }
 
+if (!file_exists($_SERVER['DOCUMENT_ROOT']."/config/config.php")) {
+    $_SERVER['DOCUMENT_ROOT'] = realpath('../../../');
+}
+
+
 $config = require_once $_SERVER['DOCUMENT_ROOT']."/config/config.php";
 $providers_config = require_once $_SERVER['DOCUMENT_ROOT']."/config/providers.php";
 
@@ -192,10 +197,10 @@ if ($providers_config['Providers']) {
 
 if ($config['middleware']) {
     foreach ($config['middleware'] as $template) {
-        if (file_exists("../../app/$template/middleware/middleware.php")) {
-            require_once("../../app/$template/middleware/middleware.php");
-        } elseif (file_exists("../../middleware/$template/autoload.php")) {
-            require_once("../../middleware/$template/autoload.php");
+        if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$template/middleware/middleware.php")) {
+            require_once($_SERVER['DOCUMENT_ROOT']."/application/app/$template/middleware/middleware.php");
+        } elseif (file_exists($_SERVER['DOCUMENT_ROOT']."/application/middleware/$template/autoload.php")) {
+            require_once($_SERVER['DOCUMENT_ROOT']."/application/middleware/$template/autoload.php");
         }
     }
 }
@@ -211,17 +216,16 @@ if ($config['templates']) {
     }
 
     if ($config['multi-tenancy'] && $multi_check) {
-        if (file_exists("../../app/$subdomain/controller/controller.php")) {
-            require_once("../controller/init.php");
-            require_once("../../app/$subdomain/controller/controller.php");
+        if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$subdomain/controller/controller.php")) {
+            require_once($_SERVER['DOCUMENT_ROOT']."/application/app/$subdomain/controller/controller.php");
         }
-        include_once("../../app/$subdomain/routes/routes.php");
+        include_once($_SERVER['DOCUMENT_ROOT']."/application/app/$subdomain/routes/routes.php");
     } else {
         foreach ($config['templates'] as $template) {
-            if (file_exists("../../app/$template/controller/controller.php")) {
-                require_once("../../app/$template/controller/controller.php");
+            if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$template/controller/controller.php")) {
+                require_once($_SERVER['DOCUMENT_ROOT']."/application/app/$template/controller/controller.php");
             }
-            include_once("../../app/$template/routes/routes.php");
+            include_once($_SERVER['DOCUMENT_ROOT']."/application/app/$template/routes/routes.php");
         }
     }
 }

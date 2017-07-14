@@ -4,30 +4,9 @@ namespace Mira;
 
 class Route
 {
-    private function __construct()
+
+    public function getPattern($url)
     {
-        //
-    }
-    
-    public static function get($url, \Closure $func)
-    {
-        $startDelimiter = "{";
-        $endDelimiter = "}";
-        
-        $contents = array();
-        $startDelimiterLength = strlen($startDelimiter);
-        $endDelimiterLength = strlen($endDelimiter);
-        $startFrom = $contentStart = $contentEnd = 0;
-        while (false !== ($contentStart = strpos($url, $startDelimiter, $startFrom))) {
-            $contentStart += $startDelimiterLength;
-            $contentEnd = strpos($url, $endDelimiter, $contentStart);
-            if (false === $contentEnd) {
-                break;
-            }
-            $contents[] = substr($url, $contentStart, $contentEnd - $contentStart);
-            $startFrom = $contentEnd + $endDelimiterLength;
-        }
-        
         $get_url_segments = explode("/", $url);
         
         $match = "";
@@ -43,8 +22,13 @@ class Route
                 $match .= "$segment\/";
             }
         }
-        
-        $get_url = $_GET['url'];
+
+        return $match;
+    }
+
+    public static function matchUrlSegments($url)
+    {
+        $get_url_segments = explode("/", $url);
         
         $params = explode("/", $_GET['url']);
         
@@ -57,121 +41,69 @@ class Route
             }
             $i++;
         }
-        
+
+        return $p;
+    }
+
+    public static function addParamtersToGlobal()
+    {
         // add query string parameters to the global GET variable
         $u = explode("?", $_SERVER['REQUEST_URI']);
         $u = explode("&", $u[1]);
         foreach ($u as $param) {
             $param = explode("=", $param);
             $param[1] = str_replace('%20', ' ', $param[1]);
-            $_GET[$param[0]] = $param[1];
+            if ($_SERVER['REQUEST_METHOD'] == "GET") {
+                $_GET[$param[0]] = $param[1];
+            } else {
+                $_POST[$param[0]] = $param[1];
+            }
+            $_GET = array_filter($_GET);
+            $_POST = array_filter($_POST);
         }
+        return array_filter($u);
+    }
+    
+    public static function get($url, \Closure $func)
+    {
+        $match = static::getPattern($url);
+        $p = static::matchUrlSegments($url);
+
+        static::addParamtersToGlobal();
 
         if ($match == "$") {
             $match = "^$";
         }
-        $_REQUEST['url'] = $_SERVER['REQUEST_URI'];
 
-        if (preg_match("/^res/", $_GET['url'])) {
-            echo $_SERVER['DOCUMENT_ROOT'];
-            echo $_GET['url'];
-            $ex = explode("/", $_GET['url'], 2);
-            echo $file = $ex[1];
-            
-            echo "<h1>";
-            echo "</h1>";
-            if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
-                header('Content-Type:');
-                readfile($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI']);
-                exit;
-            }
-        } elseif (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
+        if (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
+
             require_once 'extendsFrom.php';
+
+            $func($p[0], $p[1], $p[2], $p[3], $p[4], $p[5]);
+            return true;
+        } else {
+            return false;
         }
     }
     
     public static function post($url, \Closure $func)
     {
-        $startDelimiter = "{";
-        $endDelimiter = "}";
-        
-        $contents = array();
-        $startDelimiterLength = strlen($startDelimiter);
-        $endDelimiterLength = strlen($endDelimiter);
-        $startFrom = $contentStart = $contentEnd = 0;
-        while (false !== ($contentStart = strpos($url, $startDelimiter, $startFrom))) {
-            $contentStart += $startDelimiterLength;
-            $contentEnd = strpos($url, $endDelimiter, $contentStart);
-            
-            if (false === $contentEnd) {
-                break;
-            }
+        $match = static::getPattern($url);
+        $p = static::matchUrlSegments($url);
 
-            $contents[] = substr($url, $contentStart, $contentEnd - $contentStart);
-            $startFrom = $contentEnd + $endDelimiterLength;
-        }
-        
-        $get_url_segments = explode("/", $url);
-        
-        $match = "";
-        //print_r($get_url_segments);
-        foreach ($get_url_segments as $segment) {
-            
-            if (strpos($segment, "{") !== false) {
-                $match .= ".*";
-            } elseif ($segment == "") {
-                //
-            } elseif ($segment == "$") {
-                $match .= "$";
-            } else {
-                $match .= "$segment\/";
-            }
-        }
-        
-        $get_url = $_GET['url'];
-        
-        $params = explode("/", $_GET['url']);
-        
-        //echo "<h1>".$match."</h1>";
-        
-        
-        $i = 0;
-        $pos = 0;
-        foreach ($get_url_segments as $segment) {
-            if (strpos($segment, "{") !== false) {
-                $p[$pos] .= $params[$i];
-                $pos++;
-            }
-            $i++;
-        }
+        static::addParamtersToGlobal();
 
-        // add query string parameters to the global GET variable
-        $u = explode("?", $_SERVER['REQUEST_URI']);
-        $u = explode("&", $u[1]);
-        foreach ($u as $param) {
-            $param = explode("=", $param);
-            $_POST[$param[0]] = $param[1];
-        }
-        
         if ($match == "$") {
             $match = "^$";
         }
-        $_REQUEST['url'] = $_SERVER['REQUEST_URI'];
-        //$z = 'jmancuso';
-        
+
         if (preg_match("/^".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "POST") {
             require_once 'extendsFrom.php';
-        } elseif (preg_match("/^res/", $_GET['url'])) {
-            echo $_SERVER['DOCUMENT_ROOT'];
-            echo $_GET['url'];
-            $ex = explode("/", $_GET['url'], 2);
-            echo $file = $ex[1];
-            
-            if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
-                header('Content-Type:');
-                readfile($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI']);
-                exit;
-            }
+
+            $func($p[0], $p[1], $p[2], $p[3], $p[4], $p[5]);
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -183,7 +115,6 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
 if (!file_exists($_SERVER['DOCUMENT_ROOT']."/config/config.php")) {
     $_SERVER['DOCUMENT_ROOT'] = realpath('../../../');
 }
-
 
 $config = require_once $_SERVER['DOCUMENT_ROOT']."/config/config.php";
 $providers_config = require_once $_SERVER['DOCUMENT_ROOT']."/config/providers.php";

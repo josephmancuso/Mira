@@ -11,14 +11,15 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "miraframework/installer": "^0.1.2",
-        "miraframework/comet": "^0.1.0",
-        "lavary/crunz": "^1.4"
+        "miraframework/installer": "^0.2",
+        "miraframework/comet": "^0.1.0"
     },
     "autoload": {
         "psr-4": {
             "Mira\\": "vendor/miraframework",
-            "App\\": "application/App"
+            "App\\": "application/App",
+            "Events\\": "application/Providers/Events",
+            "Middleware\\": "application/Middleware" 
         }
     }
 }

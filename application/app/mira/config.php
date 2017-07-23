@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'header' => 'mira.base',
-    'footer' => 'mira.footer'
+      'header' => 'Mira.header',
+      'footer' => 'Mira.footer',
 ];

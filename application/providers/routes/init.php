@@ -124,17 +124,7 @@ if ($providers_config['Providers']) {
     }
 }
 
-if ($config['middleware']) {
-    foreach ($config['middleware'] as $template) {
-        if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$template/middleware/middleware.php")) {
-            require_once($_SERVER['DOCUMENT_ROOT']."/application/app/$template/middleware/middleware.php");
-        } elseif (file_exists($_SERVER['DOCUMENT_ROOT']."/application/middleware/$template/autoload.php")) {
-            require_once($_SERVER['DOCUMENT_ROOT']."/application/middleware/$template/autoload.php");
-        }
-    }
-}
-
-if ($config['templates']) {
+if ($config['Apps']) {
     $url = $_SERVER['HTTP_HOST'];
     $host = explode('.', $url);
     $subdomain = $host[0];
@@ -150,7 +140,7 @@ if ($config['templates']) {
         }
         include_once($_SERVER['DOCUMENT_ROOT']."/application/app/$subdomain/routes/routes.php");
     } else {
-        foreach ($config['templates'] as $template) {
+        foreach ($config['Apps'] as $template) {
             if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$template/controller/controller.php")) {
                 require_once($_SERVER['DOCUMENT_ROOT']."/application/app/$template/controller/controller.php");
             }

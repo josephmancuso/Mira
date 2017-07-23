@@ -2,10 +2,12 @@
 
 namespace Mira;
 
+require $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
+
 class Route
 {
 
-    public function getPattern($url)
+    public static function getPattern($url)
     {
         $get_url_segments = explode("/", $url);
         
@@ -106,10 +108,6 @@ class Route
             return false;
         }
     }
-}
-
-if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php')) {
-    include_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 }
 
 if (!file_exists($_SERVER['DOCUMENT_ROOT']."/config/config.php")) {

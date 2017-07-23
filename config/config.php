@@ -28,6 +28,6 @@ return [
     */
 
     'Apps' => [
-        'Mira'
+        'Mira',
     ],
 ];

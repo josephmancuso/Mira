@@ -2,8 +2,7 @@
 
 return [
     'Providers' => [
-        'Application\Providers\Forms', // core
-        'Application\Providers\Shorthand', // core
-        'Application\Providers\Comet', // core
+        'Vendor\MiraFramework\Shorthand', // core
+        'Vendor\MiraFramework\Comet', // core
     ]
 ];

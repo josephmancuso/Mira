@@ -9,6 +9,7 @@ use MiraCommand\CreateModel;
 use MiraCommand\CreateApp;
 use MiraCommand\CreateEvent;
 use MiraCommand\CreateMiddleware;
+use MiraCommand\InstallApp;
 
 require 'vendor/autoload.php';
 
@@ -18,8 +19,7 @@ $app->add(new CreateModel);
 $app->add(new CreateApp);
 $app->add(new CreateEvent);
 $app->add(new CreateMiddleware);
-
-
+$app->add(new InstallApp);
 $app->run();
 
 class App

@@ -36,34 +36,42 @@ class Route
         
         $i = 0;
         $pos = 0;
+        $p = [];
         foreach ($get_url_segments as $segment) {
             if (strpos($segment, "{") !== false) {
-                $p[$pos] .= $params[$i];
+                $p[$pos] = $params[$i];
                 $pos++;
             }
             $i++;
         }
 
-        return $p;
+        if (count($p)) {
+            return $p;
+        }
+
+        return false;
     }
 
-    public static function addParamtersToGlobal()
+    public static function addParametersToGlobal()
     {
         // add query string parameters to the global GET variable
         $u = explode("?", $_SERVER['REQUEST_URI']);
-        $u = explode("&", $u[1]);
-        foreach ($u as $param) {
-            $param = explode("=", $param);
-            $param[1] = str_replace('%20', ' ', $param[1]);
-            if ($_SERVER['REQUEST_METHOD'] == "GET") {
-                $_GET[$param[0]] = $param[1];
-            } else {
-                $_POST[$param[0]] = $param[1];
+        if (count($u) > 1) {
+            $u = explode("&", $u[1]);
+            foreach ($u as $param) {
+                $param = explode("=", $param);
+                $param[1] = str_replace('%20', ' ', $param[1]);
+                if ($_SERVER['REQUEST_METHOD'] == "GET") {
+                    $_GET[$param[0]] = $param[1];
+                } else {
+                    $_POST[$param[0]] = $param[1];
+                }
+                $_GET = array_filter($_GET);
+                $_POST = array_filter($_POST);
             }
-            $_GET = array_filter($_GET);
-            $_POST = array_filter($_POST);
+            return array_filter($u);
         }
-        return array_filter($u);
+        return false;
     }
     
     public static function get($url, \Closure $func)
@@ -71,7 +79,7 @@ class Route
         $match = static::getPattern($url);
         $p = static::matchUrlSegments($url);
 
-        static::addParamtersToGlobal();
+        static::addParametersToGlobal();
 
         if ($match == "$") {
             $match = "^$";
@@ -80,9 +88,14 @@ class Route
         if (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
 
             require_once 'extendsFrom.php';
+            
+            if ($p) {
+                $func(...$p);
+            } else {
+                $func();
+            }
 
-            $func($p[0], $p[1], $p[2], $p[3], $p[4], $p[5]);
-            return true;
+            die();
         } else {
             return false;
         }
@@ -93,7 +106,7 @@ class Route
         $match = static::getPattern($url);
         $p = static::matchUrlSegments($url);
 
-        static::addParamtersToGlobal();
+        static::addParametersToGlobal();
 
         if ($match == "$") {
             $match = "^$";
@@ -102,8 +115,13 @@ class Route
         if (preg_match("/^".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "POST") {
             require_once 'extendsFrom.php';
 
-            $func($p[0], $p[1], $p[2], $p[3], $p[4], $p[5]);
-            return true;
+            if ($p) {
+                $func(...$p);
+            } else {
+                $func();
+            }
+
+            die();
         } else {
             return false;
         }
@@ -139,7 +157,7 @@ if ($config['Apps']) {
         $multi_check = false;
     }
 
-    if ($config['multi-tenancy'] && $multi_check) {
+    if (isset($config['multi-tenancy']) && $multi_check) {
         if (file_exists($_SERVER['DOCUMENT_ROOT']."/application/app/$subdomain/controller/controller.php")) {
             require_once($_SERVER['DOCUMENT_ROOT']."/application/app/$subdomain/controller/controller.php");
         }

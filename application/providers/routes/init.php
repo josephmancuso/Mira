@@ -10,14 +10,36 @@ class Route
     public static function getPattern($url)
     {
         $get_url_segments = explode("/", $url);
+
+        // echo $url;
+
+        $url = str_replace("/", '\/', $url);
+        // echo str_replace(":number", '\d+', $url);
         
         $match = "";
         
         foreach ($get_url_segments as $segment) {
             if (strpos($segment, "{") !== false) {
-                $match .= ".*";
-            } elseif ($segment == "") {
-                //
+
+                if (strpos($segment, ':') !== false) {
+                    $datatype = rtrim(explode(":", $segment)[1], '}');
+                    if ($datatype == 'number') {
+                         $match .= "\d+\/";
+                    }
+                    
+                    if ($datatype == 'string') {
+                         $match .= "[A-z]+\/";
+                    }
+
+                    
+                    if ($datatype == 'alpha') {
+                         $match .= "([0-9]+[a-zA-Z]+|[a-zA-Z]+[0-9]+)[0-9a-zA-Z]*\/";
+                    }
+
+                } else {
+                    $match .= ".+\/";
+                }
+
             } elseif ($segment == "$") {
                 $match .= "$";
             } else {
@@ -25,6 +47,11 @@ class Route
             }
         }
 
+        if (substr($url, -1) == '/' && substr($match, -1) !== '/') {
+            return $match;
+        } else {
+            return rtrim($match, '\/');
+        }
         return $match;
     }
 
@@ -84,6 +111,8 @@ class Route
         if ($match == "$") {
             $match = "^$";
         }
+
+        echo "/".$match."/";
 
         if (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
 

@@ -112,8 +112,6 @@ class Route
             $match = "^$";
         }
 
-        echo "/".$match."/";
-
         if (preg_match("/".$match."/", $_GET['url']) && $_SERVER['REQUEST_METHOD'] == "GET") {
 
             require_once 'extendsFrom.php';

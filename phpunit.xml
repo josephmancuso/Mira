@@ -4,7 +4,8 @@
 
     <testsuites>
         <testsuite name="Setup Testing">
-            <file>vendor/miraframework/tests/StartTesting.php</file>
+            <!-- <file>vendor/miraframework/testing/StartTesting.php</file> -->
+            <file>application/providers/testing/StartTesting.php</file> 
         </testsuite>
         <testsuite name="Application Tests">
             <directory>tests/</directory>

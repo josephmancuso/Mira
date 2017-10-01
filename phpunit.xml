@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true"
+    stopOnFailure="false">
+
+    <testsuites>
+        <testsuite name="Setup Testing">
+            <file>vendor/miraframework/tests/StartTesting.php</file>
+        </testsuite>
+        <testsuite name="Application Tests">
+            <directory>tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

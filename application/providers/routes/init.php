@@ -157,8 +157,10 @@ class Route
 
 define('__PROJECT__', $_SERVER['DOCUMENT_ROOT']);
 
-$dotenv = new \Dotenv\Dotenv(__PROJECT__);
-$dotenv->load();
+if(file_exists(__PROJECT__."/.env")) {
+    $dotenv = new \Dotenv\Dotenv(__PROJECT__);
+    $dotenv->load();
+}
 
 if (!file_exists($_SERVER['DOCUMENT_ROOT']."/config/config.php")) {
     $_SERVER['DOCUMENT_ROOT'] = realpath('../../../');

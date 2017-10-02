@@ -22,14 +22,14 @@ Then run:
 
     $ composer install
 
-Open up a browser and navigation to your localhost.
+Open up a browser and navigation to your localhost. You should see the Mira default App.
 
 ### Install a self-contained app
 
-inside the root of the project (where `cli.php` is located)
+Inside the root of the project (where `mira` is located)
 
 ```shell
-$ php cli.php --install taloncode/mustache
+$ php mira new:install taloncode/mustache
 ```
 This will install an app from GitHub into your project 
 
@@ -39,139 +39,45 @@ Then add mustache to the main config file inside a templates array ABOVE mira so
 
 ```php
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Database Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Set the database variables username and password to match the username
+    | and password of your MySQL database. You'll be able to use the framework
+    | without this setting until you start adding models.
+    |
+    */
+
     'database' => [
-        'username' => 'user',
-        'password' => 'password',
+        'host' => 'localhost',
+        'username' => 'database_username',
+        'password' => 'database_password',
     ],
-    'templates' => [
-        'mustache',
-        'mira',
-    ]
+
+    /*
+    |--------------------------------------------------------------------------
+    | Apps
+    |--------------------------------------------------------------------------
+    |
+    | Any apps you want Mira to register, put here. Putting apps here will
+    | auto register both the controllers and routes.
+    |
+    */
+
+    'Apps' => [
+        'Mustache',
+        'Mira',
+    ],
+
+    'Debug' => true,
 ];
 ```
 
-Open up your project using your normal webserver (like typing localhost into your browser)
+Open up your project using your normal webserver (like typing localhost into your browser). You should see the Mustache App website
 
 More information inside the wiki
-
-## Examples
-
-## Routing
-
-```php
-// application/Routes.php
-
-use Mira\Route;
-use Mira\Render;
-
-Route::get("path/to/url", function(){
-     Render::view("appname.template", 
-     [
-          "variable" => "value",
-          "another_variable" => "value"
-     ]
-     );
-});
-```
-
-You can also get certain values from the URL and pass them to your view or use them in your Closure
-
-```php
-// application/Routes.php
-
-use Mira\Route;
-use Mira\Render;
-
-// URL: website.com/baseball/player/123/
-Route::get("baseball/player/{id}/", function($id){
-     // $id is now accessible : $id = 123
-     $model = new model("database");
-     $player = $model->filter(" id = '$id' ");
-
-     Render::view("appname.template", 
-     [
-          "player" => $player
-     ]
-     );
-});
-```
-
-## Models
-
-```php
-// models/models.php
-
-use Mira\Model;
-
-class table extends Model{}
-```
-
-You may specify the database in 1 of 2 ways.
-
-Inside the class:
-
-```php
-// models.php
-
-use Mira\Model;
-
-class table extends Model{
-    protected $db = "database_name";
-}
-```
-
-or during instantiation:
-
-```php
-// routes.php
-
-$model = new table("database_name");
-```
-
-## Controllers
-
-Controller take on a new meaning in Mira
-
-Controllers can get really messy and the best way to create enterprise level software is to compartmentalize your software.
-
-In Mira, controllers aren't conventional classes, but they are closures that compartmentalize your Routes.
-
-This is an example of a controller in Mira:
-
-```php
-// the method for controller:: can be any name you want, it is more of a category name
-
-use Mira\Route;
-use Mira\Render;
-
-controller::name(function(){
-
-    // controller level variables
-    $posts = new posts();
-    $authors = new authors();
-
-    Routes::get('url/path/$', function() use ($authors){
-
-        Render::view('app.template', [
-            'authors' => $authors
-        ]);
-
-    });
-
-    Routes::get('url/path/posts/$', function() use ($posts, $authors){
-
-        Render::view('app.template2', [
-            'authors' => $authors,
-            'posts' => $posts
-        ]);
-
-    });
-
-
-});
-``` 
-
-Controllers in Mira just abstracts some of the logic for `Routes` class. Controllers just take multiple routers and match like normal Routes
 
 ## Apps
 
@@ -181,100 +87,28 @@ Apps are designed to be complete containers. In other words, they are being desi
 
 To create an app, go to the command line and go to the root of your project.
 
-    $ php cli.php --new appname
+    $ php mira new:app Appname
 
 This will create a new app in the app folder and put all needed files inside it.
-
-### Config file
-
-The config file is meant to create app specific header and footer templates
-
-```php
-// application/app/appname/config.php file
-
-return [
-    "header" => "appname.base",
-    "footer" => "appname.footer"
-];
-```
 
 ### Installing Apps
 
 Apps can be installed from GitHub. Find the app you want on GitHub and then in the command line do:
 
-In the root directory, (the directory that contains the `cli.php` file)
+In the root directory, (the directory that contains the `mira` file)
 
 ```shell
-    $ php cli.php --install githubaccount/reponame
+    $ php mira new:install githubaccount/reponame
 ```
 
 To try this out for a real app, do: 
 
 ```shell
-    $ php cli.php --install taloncode/mustache
+    $ php mira new:install taloncode/mustache
 ```
 
-this will install an pre made app into your `app` directory
+this will install a pre made app into your `app` directory
 
-### Linking the Router
+remember to put the name of the app in the Apps array in your config file.
 
-Each app can have its own router added to the main Routes file. 
-
-Open up your main `config/config.php` file and add a `templates` array to the file like so:
-
-```php
-return [
-    'database' => [
-        'username' => 'user',
-        'password' => 'password',
-    ],
-    'templates' => [
-        'dollarscore',
-        'mustache',
-    ],
-    'header' => 'dollarscore.base',
-    'footer' => 'dollarscore.footer',
-];
-```
-
-This will add the apps routers in order they are in the templates array
-
-## Templates
-
-Templates can be used in the `app/app_name/templates/` directory.
-
-A route and template example might look like this:
-
-```php
-// inside Routes/route.pgp
-
-use Mira\Route;
-use Mira\Render;
-
-Route::get("baseball/player/{id}/$", function(){
-    $player = new player();
-    $players = $player->filter(" id = '$id' ");
-
-    Render::view("baseball.player-roster", [
-        "players" => $player,
-    ]);
-});
-```
-
-then inside your template:
-
-```php
-// inside application/app/baseball/templates/player-roster.php
-
-foreach ($players as $player) {
-    echo $player['id'];
-}
-```
-
-if you end your template in `.engine.php` then you can also do:
-
-```php
-@foreach ($players as $player)
-    {{ $player }}
-@endforeach
-```
+Read the documentation for more info

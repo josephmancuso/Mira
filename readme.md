@@ -70,8 +70,6 @@ return [
         'Mustache',
         'Mira',
     ],
-
-    'Debug' => true,
 ];
 ```
 
